@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1B3A5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Хаузмастер</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  :root {
+    --navy: #1B3A5C;
+    --blue: #2E6DA4;
+    --steel: #4A7FA5;
+    --gold: #C9A227;
+    --red: #C0392B;
+    --green: #1E7A4B;
+    --emrg: #7F0000;
+    --light: #EBF2F8;
+    --mid: #F4F6F8;
+    --text: #1A1A2E;
+    --muted: #5A6A7A;
+    --white: #FFFFFF;
+    --roof: #3E2723;
+    --base: #1A3A2A;
+    --heat: #7B1A1A;
+    --watr: #0D3B6E;
+    --elec: #1A237E;
+    --kz: #00AFCA;
+    --l1: #E8F5E9;
+    --l2: #FFF8E7;
+    --l3: #FFF0F0;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+    background: var(--mid);
+    color: var(--text);
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 120px;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--navy);
+    color: white;
+    padding: 14px 16px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: 0.3px; flex: 1; }
+  .topbar-sub { font-size: 11px; color: rgba(255,255,255,0.55); display: block; }
+  .search-wrap { position: relative; padding: 10px 16px; background: var(--navy); }
+  .search-input {
+    width: 100%; padding: 9px 14px 9px 36px;
+    border-radius: 8px; border: none;
+    background: rgba(255,255,255,0.12);
+    color: white; font-size: 15px;
+    outline: none;
+  }
+  .search-input::placeholder { color: rgba(255,255,255,0.45); }
+  .search-icon { position: absolute; left: 26px; top: 50%; transform: translateY(-50%); opacity: 0.5; font-size: 15px; }
+  .search-clear {
+    position: absolute; right: 26px; top: 50%; transform: translateY(-50%);
+    color: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer;
+    display: none;
+  }
+
+  /* BOTTOM NAV */
+  .bottomnav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: var(--white);
+    border-top: 1px solid #E0E0E0;
+    display: flex; z-index: 100;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; padding: 8px 4px 10px;
+    font-size: 11px; color: var(--muted);
+    border: none; background: none; cursor: pointer;
+    transition: color 0.15s;
+  }
+  .nav-btn.active { color: var(--navy); }
+  .nav-btn .icon { font-size: 25px; margin-bottom: 3px; }
+  .nav-btn.emrg-btn { color: var(--emrg); }
+  .nav-btn.emrg-btn.active { color: var(--emrg); }
+
+  /* PAGES */
+  .page { display: none; padding: 0; }
+  .page.active { display: block; }
+
+  /* SECTION */
+  .section { padding: 12px 16px 4px; }
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 12px 14px 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-body { padding: 0 14px 14px; }
+  .card-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 3px 7px; border-radius: 5px;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* DOMAIN COLORS */
+  .dom-roof { background: var(--roof); color: white; }
+  .dom-base { background: var(--base); color: white; }
+  .dom-heat { background: var(--heat); color: white; }
+  .dom-watr { background: var(--watr); color: white; }
+  .dom-elec { background: var(--elec); color: white; }
+  .dom-emrg { background: var(--emrg); color: white; }
+
+  .sev-l1 { background: var(--l1); color: var(--green); border: 1px solid var(--green); }
+  .sev-l2 { background: var(--l2); color: #8B6914; border: 1px solid #C9A227; }
+  .sev-l3 { background: var(--l3); color: var(--red); border: 1px solid var(--red); }
+
+  /* EMERGENCY CARD */
+  .emrg-card {
+    background: var(--emrg);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    box-shadow: 0 3px 10px rgba(127,0,0,0.25);
+    opacity: 0.97;
+  }
+  .emrg-card:hover {
+    transform: scale(1.025);
+    box-shadow: 0 8px 24px rgba(127,0,0,0.45);
+    opacity: 1;
+  }
+  .emrg-card:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(127,0,0,0.3);
+  }
+  .emrg-header { padding: 14px 16px 10px; }
+  .emrg-code { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 700; letter-spacing: 0.5px; }
+  .emrg-name { font-size: 18px; font-weight: 800; color: white; margin-top: 2px; line-height: 1.3; }
+  .emrg-calls { display: flex; gap: 8px; padding: 0 16px 12px; flex-wrap: wrap; }
+  .emrg-call-btn {
+    background: rgba(255,255,255,0.15);
+    color: white; border: none; border-radius: 20px;
+    padding: 6px 14px; font-size: 14px; font-weight: 700;
+    cursor: pointer; text-decoration: none; display: inline-flex;
+    align-items: center; gap: 5px;
+    transition: background 0.15s;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .emrg-call-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+  .emrg-call-btn:active { transform: scale(0.96); }
+  .emrg-call-btn:hover { background: rgba(255,255,255,0.25); }
+  .emrg-call-primary { background: white; color: var(--emrg); }
+  .emrg-steps { background: white; padding: 12px 16px; }
+  .emrg-step {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .step-num {
+    min-width: 26px; height: 26px;
+    background: var(--emrg); color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+  .step-num.urgent { background: #CC0000; }
+  .step-text { font-size: 15px; line-height: 1.5; padding-top: 3px; }
+  .step-text.urgent { color: var(--emrg); font-weight: 700; }
+  .emrg-dont {
+    background: var(--l3); border-radius: 0 0 var(--radius) var(--radius);
+    padding: 10px 16px;
+  }
+  .emrg-dont-title { font-size: 11px; font-weight: 800; color: var(--emrg); letter-spacing: 0.5px; margin-bottom: 6px; }
+  .dont-item { font-size: 13px; color: var(--text); margin-bottom: 4px; }
+  .dont-item::before { content: '✗  '; color: var(--emrg); font-weight: 700; }
+
+  /* CHECKLIST */
+  .checklist-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #F0F0F0;
+    cursor: pointer;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 22px; height: 22px; border-radius: 5px;
+    border: 2px solid #CCC; flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; background: white;
+  }
+  .checklist-item.checked .check-box {
+    background: var(--green); border-color: var(--green); color: white;
+  }
+  .check-text { font-size: 15px; line-height: 1.5; }
+  .check-code { font-size: 11px; color: var(--blue); font-weight: 700; margin-top: 2px; }
+  .checklist-item.checked .check-text { color: var(--muted); text-decoration: line-through; }
+
+  /* SYMPTOM */
+  .symptom-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #F0F0F0;
+    cursor: pointer;
+    background: white;
+    transition: background 0.1s;
+  }
+  .symptom-item:last-child { border-bottom: none; }
+  .symptom-item:hover { background: var(--light); }
+  .symptom-domain { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .symptom-text { flex: 1; }
+  .symptom-name { font-size: 16px; font-weight: 700; }
+  .symptom-action { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .symptom-arrow { color: #CCC; font-size: 16px; }
+
+  /* GLOSSARY */
+  .gloss-item {
+    padding: 11px 14px;
+    border-bottom: 1px solid #F0F0F0;
+    background: white;
+  }
+  .gloss-item:last-child { border-bottom: none; }
+  .gloss-abbr { font-size: 15px; font-weight: 800; color: var(--navy); }
+  .gloss-ru { font-size: 14px; color: var(--text); margin-top: 1px; }
+  .gloss-kz { font-size: 13px; color: var(--kz); font-style: italic; margin-top: 1px; }
+  .gloss-def { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  /* CALENDAR */
+  .season-card {
+    border-radius: var(--radius); overflow: hidden;
+    margin-bottom: 10px; box-shadow: var(--shadow);
+  }
+  .season-header { padding: 12px 14px; color: white; }
+  .season-name { font-size: 17px; font-weight: 800; }
+  .season-months { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+  .season-body { background: white; padding: 12px 14px; }
+  .season-item { font-size: 13px; color: var(--text); padding: 4px 0; display: flex; gap: 6px; }
+  .season-item::before { content: '□'; color: var(--muted); flex-shrink: 0; }
+  .season-risk { color: var(--red); font-size: 13px; padding: 4px 0; display: flex; gap: 6px; }
+  .season-risk::before { content: '⚠'; flex-shrink: 0; }
+
+  /* CONTACTS */
+  .contact-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-bottom: 1px solid #F0F0F0;
+    background: white;
+  }
+  .contact-row:last-child { border-bottom: none; }
+  .contact-num { font-size: 20px; font-weight: 900; color: var(--emrg); min-width: 50px; }
+  .contact-info { flex: 1; }
+  .contact-name { font-size: 15px; font-weight: 700; }
+  .contact-when { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .call-btn {
+    background: var(--emrg); color: white; border: none;
+    border-radius: 8px; padding: 8px 14px; font-size: 14px;
+    font-weight: 700; cursor: pointer; text-decoration: none;
+    display: inline-block;
+  }
+
+  /* SEVERITY CARD */
+  .sev-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 16px 12px; }
+  .sev-col { border-radius: var(--radius); overflow: hidden; }
+  .sev-col-header { padding: 10px; text-align: center; color: white; font-weight: 800; font-size: 15px; }
+  .sev-col-body { padding: 10px; font-size: 13px; line-height: 1.5; }
+  .sev-sla { font-weight: 700; margin-top: 6px; font-size: 11px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; width: 100%; max-width: 480px;
+    border-radius: 16px 16px 0 0;
+    max-height: 85vh; overflow-y: auto;
+    padding-bottom: 24px;
+  }
+  .modal-handle { width: 36px; height: 4px; background: #DDD; border-radius: 2px; margin: 12px auto 8px; }
+  .modal-header { padding: 0 16px 12px; }
+  .modal-title { font-size: 18px; font-weight: 800; color: var(--navy); }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .modal-section { padding: 0 16px; margin-bottom: 12px; }
+  .modal-label { font-size: 11px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .modal-list { list-style: none; }
+  .modal-list li { font-size: 14px; padding: 4px 0; display: flex; gap: 7px; line-height: 1.4; }
+  .modal-list li::before { content: '▸'; color: var(--blue); flex-shrink: 0; font-size: 12px; margin-top: 2px; }
+  .modal-close { margin: 0 16px; width: calc(100% - 32px); padding: 12px; background: var(--light); border: none; border-radius: 8px; font-size: 15px; font-weight: 600; color: var(--navy); cursor: pointer; }
+
+  /* MISC */
+  .divider { height: 8px; }
+  .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+  .tag-v2 { background: var(--light); color: var(--blue); }
+  .tag-v3 { background: var(--l1); color: var(--green); }
+  .tag-capex { background: #F3E5F5; color: #7B1FA2; }
+  .no-results { text-align: center; padding: 40px 16px; color: var(--muted); font-size: 15px; }
+  .reset-btn { display: block; margin: 12px auto 0; background: var(--light); border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; color: var(--navy); cursor: pointer; }
+
+  /* TOOLTIP */
+  [data-tip] { position: relative; cursor: pointer; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 7px); left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26,26,46,0.95); color: white;
+    font-size: 12px; font-weight: 500; line-height: 1.3;
+    padding: 6px 10px; border-radius: 7px;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity 0.18s;
+    z-index: 999; max-width: 220px; white-space: normal; text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  }
+  [data-tip]::before {
+    content: '';
+    position: absolute; bottom: calc(100% + 2px); left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(26,26,46,0.95);
+    pointer-events: none; opacity: 0; transition: opacity 0.18s; z-index: 999;
+  }
+  [data-tip]:hover::after, [data-tip]:hover::before { opacity: 1; }
+  [data-tip]:active::after, [data-tip]:active::before { opacity: 0; }
+
+  /* ONBOARDING */
+  #onboarding {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--navy); z-index: 9000;
+    flex-direction: column; align-items: center;
+    justify-content: center; padding: 32px 24px;
+    overflow-y: auto;
+  }
+  #onboarding.visible { display: flex !important; }
+
+  /* CALL BUTTON — always clickable */
+  .call-btn, .emrg-call-btn {
+    -webkit-user-select: none; user-select: none;
+    position: relative; z-index: 1;
+  }
+  .call-btn:active { transform: scale(0.96); }
+  .emrg-call-btn:active { transform: scale(0.96); }
+
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING SCREEN -->
+<div id="onboarding">
+  <div style="font-size:48px;margin-bottom:16px">🏠</div>
+  <div style="font-size:26px;font-weight:900;color:white;margin-bottom:6px;text-align:center">ХАУЗМАСТЕР</div>
+  <div style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:36px;text-align:center">Первый запуск — заполни профиль</div>
+  <div style="width:100%;max-width:360px;background:rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin-bottom:20px">
+    <div style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:16px">Профиль хаузмастера</div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:6px">ФИО</div>
+      <input id="ob-name" type="text" placeholder="Иванов Иван Иванович"
+        style="width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;background:rgba(255,255,255,0.08);color:white;font-size:15px;outline:none;font-family:inherit">
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:6px">Телефон</div>
+      <input id="ob-phone" type="tel" placeholder="+7 (___) ___-__-__"
+        style="width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;background:rgba(255,255,255,0.08);color:white;font-size:15px;outline:none;font-family:inherit">
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:6px">Адрес МКД</div>
+      <input id="ob-address" type="text" placeholder="ул. Ленина, 42, Семей"
+        style="width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;background:rgba(255,255,255,0.08);color:white;font-size:15px;outline:none;font-family:inherit">
+    </div>
+    <div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:6px">ID контракта</div>
+      <input id="ob-contract" type="text" placeholder="КЗ-2024-СМЙ-042"
+        style="width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;background:rgba(255,255,255,0.08);color:white;font-size:15px;outline:none;font-family:inherit">
+    </div>
+  </div>
+  <button onclick="saveOnboarding()"
+    style="width:100%;max-width:360px;padding:16px;background:var(--gold);color:var(--navy);border:none;border-radius:12px;font-size:16px;font-weight:900;cursor:pointer">
+    Начать работу →
+  </button>
+  <div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.3);text-align:center">Данные хранятся только на вашем устройстве</div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar" style="flex-direction:column;align-items:flex-start;padding:14px 16px 10px">
+  <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+    <div>
+      <div class="topbar-title">ХАУЗМАСТЕР</div>
+      <span class="topbar-sub">Поддержка ОСИ и жителей МКД Казахстана</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button onclick="showHMProfile()" id="hm-avatar" data-tip="Мой профиль"
+        style="display:none;background:rgba(201,162,39,0.2);border:1.5px solid rgba(201,162,39,0.5);
+               border-radius:8px;padding:4px 10px;cursor:pointer;text-align:right">
+        <div style="font-size:9px;color:var(--gold);font-weight:700;letter-spacing:0.5px">ХАУЗМАСТЕР</div>
+        <div id="hm-name-short" style="font-size:11px;color:white;font-weight:700">—</div>
+      </button>
+      <div style="background:rgba(201,162,39,0.18);border:1px solid rgba(201,162,39,0.4);border-radius:6px;padding:3px 8px;text-align:right">
+        <div style="font-size:9px;color:var(--gold);font-weight:700;letter-spacing:0.5px">ПИЛОТ</div>
+        <div style="font-size:11px;color:white;font-weight:700">Семей · ОСИ РК</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:8px;background:rgba(192,57,43,0.15);border-left:3px solid var(--red);border-radius:0 5px 5px 0;padding:5px 10px;width:100%">
+    <span style="font-size:11px;color:#FFAAAA;font-weight:600">⚠ В экстренной ситуации — сначала безопасность людей, потом документирование.</span>
+  </div>
+</div>
+
+<!-- PAGES -->
+
+<!-- EMERGENCY PAGE -->
+<div class="page active" id="page-emrg">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search-emrg" placeholder="Искать аварию..." oninput="filterEmrg(this.value)">
+    <span class="search-clear" id="clear-emrg" onclick="clearSearch('emrg')">×</span>
+  </div>
+  <div id="hm-card-section" style="display:none;padding:12px 16px 4px">
+    <div style="background:var(--navy);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.15)">
+      <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.08)">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px">Ваш хаузмастер</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:44px;height:44px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🧰</div>
+          <div style="flex:1">
+            <div id="hm-card-name" style="font-size:16px;font-weight:800;color:white">—</div>
+            <div id="hm-card-address" style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px">—</div>
+          </div>
+          <div id="hm-card-contract" style="font-size:10px;color:var(--gold);font-weight:700;text-align:right">—</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+        <button id="hm-call-btn"
+          style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;
+                 background:none;border:none;border-right:1px solid rgba(255,255,255,0.08);cursor:pointer">
+          <span style="font-size:20px">📞</span>
+          <span style="font-size:11px;font-weight:700;color:white">Позвонить</span>
+        </button>
+        <a id="hm-wa-btn" href="#" target="_blank"
+          style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;
+                 text-decoration:none;border-right:1px solid rgba(255,255,255,0.08)">
+          <span style="font-size:20px">💬</span>
+          <span style="font-size:11px;font-weight:700;color:white">WhatsApp</span>
+        </a>
+        <a id="hm-tg-btn" href="#" target="_blank"
+          style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;
+                 text-decoration:none">
+          <span style="font-size:20px">✈️</span>
+          <span style="font-size:11px;font-weight:700;color:white">Telegram</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-label">⚡ Контакты — набрать немедленно</div>
+    <div class="card" id="contacts-card">
+      <div id="contacts-list"></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-label">⚡ Экспресс-действия — прямо сейчас</div>
+    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch">
+      <div style="min-width:168px;background:#7F0000;border-radius:10px;padding:14px;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,0.25)">
+        <div style="font-size:22px;margin-bottom:7px">🌫</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:7px">Запах газа</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.85);line-height:1.5;margin-bottom:10px">1. Не включать свет<br>2. Открыть окна<br>3. Выйти из здания</div>
+        <a href="javascript:void(0)" onclick="handleCall(event,'104')"
+          style="display:flex;align-items:center;justify-content:center;gap:6px;
+            background:white;color:#7F0000;border-radius:8px;padding:10px;
+            text-align:center;font-size:15px;font-weight:900;text-decoration:none;
+            box-shadow:0 2px 6px rgba(0,0,0,0.2);cursor:pointer;
+            -webkit-tap-highlight-color:rgba(0,0,0,0.1)">
+          📞 <span>104</span>
+        </a>
+      </div>
+      <div style="min-width:168px;background:#7B1A1A;border-radius:10px;padding:14px;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,0.25)">
+        <div style="font-size:22px;margin-bottom:7px">🔥</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:7px">Пожар / дым</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.85);line-height:1.5;margin-bottom:10px">1. Вызвать 101<br>2. Не использовать лифт<br>3. Закрыть двери</div>
+        <a href="javascript:void(0)" onclick="handleCall(event,'101')"
+          style="display:flex;align-items:center;justify-content:center;gap:6px;
+            background:white;color:#7B1A1A;border-radius:8px;padding:10px;
+            text-align:center;font-size:15px;font-weight:900;text-decoration:none;
+            box-shadow:0 2px 6px rgba(0,0,0,0.2);cursor:pointer">
+          📞 <span>101</span>
+        </a>
+      </div>
+      <div style="min-width:168px;background:#0D3B6E;border-radius:10px;padding:14px;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,0.25)">
+        <div style="font-size:22px;margin-bottom:7px">💦</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:7px">Прорыв трубы</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.85);line-height:1.5;margin-bottom:10px">1. Перекрыть стояк<br>2. Уведомить жителей<br>3. Вызвать аварийную</div>
+        <a href="javascript:void(0)" onclick="handleCall(event,'112')"
+          style="display:flex;align-items:center;justify-content:center;gap:6px;
+            background:white;color:#0D3B6E;border-radius:8px;padding:10px;
+            text-align:center;font-size:15px;font-weight:900;text-decoration:none;
+            box-shadow:0 2px 6px rgba(0,0,0,0.2);cursor:pointer">
+          📞 <span>112</span>
+        </a>
+      </div>
+      <div style="min-width:168px;background:#1B3A5C;border-radius:10px;padding:14px;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,0.25)">
+        <div style="font-size:22px;margin-bottom:7px">🏗</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:7px">Угроза обрушения</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.85);line-height:1.5;margin-bottom:10px">1. Оцепить зону<br>2. Вызвать 112<br>3. Эвакуировать людей</div>
+        <a href="javascript:void(0)" onclick="handleCall(event,'112')"
+          style="display:flex;align-items:center;justify-content:center;gap:6px;
+            background:white;color:#1B3A5C;border-radius:8px;padding:10px;
+            text-align:center;font-size:15px;font-weight:900;text-decoration:none;
+            box-shadow:0 2px 6px rgba(0,0,0,0.2);cursor:pointer">
+          📞 <span>112</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-label">🚨 Аварийные регламенты</div>
+    <div id="sop-list"></div>
+  </div>
+</div>
+
+<!-- SYMPTOMS PAGE -->
+<div class="page" id="page-symptoms">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search-sym" placeholder="Описать симптом..." oninput="filterSymptoms(this.value)">
+    <span class="search-clear" id="clear-sym" onclick="clearSearch('sym')">×</span>
+  </div>
+  <div class="section">
+    <div class="section-label">Симптом → карточка осмотра</div>
+  </div>
+  <div class="card" id="symptom-list"></div>
+</div>
+
+<!-- CHECKLIST PAGE -->
+<div class="page" id="page-checks">
+  <div class="section" style="padding-bottom:0">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px" id="domain-tabs"></div>
+  </div>
+  <div class="section">
+    <div class="section-label" id="check-domain-label">Выберите домен</div>
+    <div class="card">
+      <div class="card-body" id="checklist-body" style="padding-top:8px"></div>
+    </div>
+    <button class="reset-btn" onclick="resetChecklist()">↺ Сбросить чек-лист</button>
+  </div>
+  <div class="section">
+    <div class="section-label">Уровни severity</div>
+    <div class="sev-grid">
+      <div class="sev-col">
+        <div class="sev-col-header" style="background:var(--green)">L1</div>
+        <div class="sev-col-body" style="background:var(--l1)">
+          Нет угрозы. Плановое ТО.
+          <div class="sev-sla" style="color:var(--green)">SLA: 5–10 р.д.</div>
+        </div>
+      </div>
+      <div class="sev-col">
+        <div class="sev-col-header" style="background:#8B6914">L2</div>
+        <div class="sev-col-body" style="background:var(--l2)">
+          Срочно. Риск нарастания.
+          <div class="sev-sla" style="color:#8B6914">SLA: ≤ 24 ч</div>
+        </div>
+      </div>
+      <div class="sev-col">
+        <div class="sev-col-header" style="background:var(--red)">L3</div>
+        <div class="sev-col-body" style="background:var(--l3)">
+          Авария. Угроза жизни.
+          <div class="sev-sla" style="color:var(--red)">SLA: ≤ 1–2 ч</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GLOSSARY / REFERENCE PAGE -->
+<div class="page" id="page-ref">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search-gloss" placeholder="Искать термин..." oninput="filterGloss(this.value)">
+    <span class="search-clear" id="clear-gloss" onclick="clearSearch('gloss')">×</span>
+  </div>
+  <div class="section">
+    <div class="section-label">Глоссарий RU / KZ</div>
+    <div class="card" id="gloss-list"></div>
+  </div>
+  <div class="section">
+    <div class="section-label">Сезонный календарь</div>
+    <div id="season-list"></div>
+  </div>
+</div>
+
+
+<!-- МКД PAGE -->
+<div class="page" id="page-mkd">
+  <div style="background:var(--navy);padding:48px 16px 16px">
+    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">База МКД</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5)">Дома под обслуживанием</div>
+  </div>
+  <div style="padding:12px 16px 4px">
+    <div id="mkd-active-card" style="display:none;background:var(--navy);border-radius:12px;padding:14px 16px;margin-bottom:12px;border:2px solid var(--gold)">
+      <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:0.8px;margin-bottom:6px">АКТИВНЫЙ МКД</div>
+      <div id="mkd-active-name" style="font-size:16px;font-weight:800;color:white"></div>
+      <div id="mkd-active-meta" style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px"></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Все дома</div>
+    <div id="mkd-list"></div>
+    <button onclick="showAddMKD()"
+      style="width:100%;margin-top:10px;padding:14px;background:var(--light);border:2px dashed #CCC;
+             border-radius:12px;font-size:14px;font-weight:700;color:var(--navy);cursor:pointer">
+      + Добавить МКД (председатель ОСИ)
+    </button>
+  </div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div class="page" id="page-history">
+  <div style="background:var(--navy);padding:48px 16px 16px">
+    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">История заявок</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5)" id="history-sub">Все МКД</div>
+  </div>
+  <div style="padding:12px 16px 4px;display:flex;gap:6px;flex-wrap:wrap" id="history-filters">
+    <button onclick="filterHistory('all')" id="hf-all" style="padding:6px 12px;border-radius:20px;border:none;font-size:12px;font-weight:700;background:var(--navy);color:white;cursor:pointer">Все</button>
+    <button onclick="filterHistory('open')" id="hf-open" style="padding:6px 12px;border-radius:20px;border:none;font-size:12px;font-weight:700;background:#E0E0E0;color:var(--muted);cursor:pointer">Открытые</button>
+    <button onclick="filterHistory('closed')" id="hf-closed" style="padding:6px 12px;border-radius:20px;border:none;font-size:12px;font-weight:700;background:#E0E0E0;color:var(--muted);cursor:pointer">Закрытые</button>
+  </div>
+  <div style="padding:8px 16px" id="history-list"></div>
+</div>
+
+<!-- NORMATIVKA PAGE -->
+<div class="page" id="page-norms">
+  <div style="background:var(--navy);padding:48px 16px 16px">
+    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">Нормативная база</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5)">Законы РК · Шаблоны актов</div>
+  </div>
+  <div style="padding:12px 16px 4px;display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px" id="norm-tabs">
+    <button onclick="showNormTab('laws')" id="nt-laws" style="padding:7px 14px;border-radius:20px;border:none;font-size:13px;font-weight:700;background:var(--navy);color:white;cursor:pointer">📋 Законы</button>
+    <button onclick="showNormTab('acts')" id="nt-acts" style="padding:7px 14px;border-radius:20px;border:none;font-size:13px;font-weight:700;background:#E0E0E0;color:var(--muted);cursor:pointer">📝 Акты</button>
+  </div>
+  <div style="padding:0 16px 16px" id="norms-content"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottomnav" style="flex-direction:column;height:auto">
+  <div style="display:flex;width:100%;border-bottom:1px solid #F0F0F0">
+    <button class="nav-btn emrg-btn active" id="nav-emrg" onclick="showPage('emrg')" data-tip="Аварийные контакты и SOP">
+      <span class="icon">🚨</span>Аварии
+    </button>
+    <button class="nav-btn" id="nav-symptoms" onclick="showPage('symptoms')" data-tip="Симптом → карточка осмотра">
+      <span class="icon">🔍</span>Симптомы
+    </button>
+    <button class="nav-btn" id="nav-checks" onclick="showPage('checks')" data-tip="Плановый осмотр по доменам">
+      <span class="icon">☑</span>Чек-лист
+    </button>
+    <button class="nav-btn" id="nav-ref" onclick="showPage('ref')" data-tip="Глоссарий RU/KZ">
+      <span class="icon">📖</span>Справка
+    </button>
+  </div>
+  <div style="display:flex;width:100%">
+    <button class="nav-btn" id="nav-mkd" onclick="showPage('mkd')" data-tip="База МКД">
+      <span class="icon">🏢</span>МКД
+    </button>
+    <button class="nav-btn" id="nav-history" onclick="showPage('history')" data-tip="История заявок">
+      <span class="icon">📅</span>История
+    </button>
+    <button class="nav-btn" id="nav-norms" onclick="showPage('norms')" data-tip="Нормативная база РК">
+      <span class="icon">⚖️</span>Законы
+    </button>
+    <button class="nav-btn" style="opacity:0;pointer-events:none"><span class="icon"></span></button>
+  </div>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <div class="modal-handle"></div>
+    <div id="modal-inner"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA — from Housemaster Handbook MVP 1.0
+// ═══════════════════════════════════════════════════════
+
+const CONTACTS = [
+  {num:'101', name:'Пожарная служба', when:'Пожар, задымление, горение щитка'},
+  {num:'103', name:'Скорая помощь', when:'Пострадавшие, ожоги, травмы'},
+  {num:'104', name:'Газовая служба', when:'Запах газа в любом помещении МКД'},
+  {num:'112', name:'МЧС', when:'Угроза жизни, обрушение, нет тепла при -10°C'},
+];
+
+const SOPS = [
+  {
+    code:'SOP-001', name:'Пожар / задымление',
+    trigger:'Открытое пламя, дым, запах горелого',
+    calls:[{num:'101',label:'101 — Пожарные'},{num:'103',label:'103 — Скорая'},{num:'112',label:'112 — МЧС'}],
+    steps:[
+      {text:'Вызвать 101. Назвать адрес, подъезд, этаж.', urgent:true},
+      {text:'Объявить эвакуацию по подъезду снизу вверх.'},
+      {text:'Не использовать лифт. Эвакуация по лестнице.'},
+      {text:'Закрыть (не запирать) двери квартир — замедляет огонь.'},
+      {text:'Встретить пожарных у входа.'},
+      {text:'Не входить в задымлённые помещения.', urgent:true},
+    ],
+    dont:['Тушить электроприборы водой','Пользоваться лифтом','Открывать окна в горящей комнате'],
+  },
+  {
+    code:'SOP-002', name:'Утечка газа',
+    trigger:'Запах газа (тухлые яйца) в подвале, МОП, от жителей',
+    calls:[{num:'104',label:'104 — Газовая служба'},{num:'112',label:'112 — МЧС'}],
+    steps:[
+      {text:'НЕ ВХОДИТЬ в помещение с запахом газа.', urgent:true},
+      {text:'НЕ включать/выключать свет и электроприборы — искра = взрыв.', urgent:true},
+      {text:'Вызвать 104 снаружи здания.', urgent:true},
+      {text:'Открыть двери и окна для проветривания.'},
+      {text:'Эвакуировать жителей из здания.'},
+      {text:'Оцепить здание. Ждать газовую службу снаружи.'},
+    ],
+    dont:['Входить в загазованное помещение','Использовать телефон внутри','Включать/выключать электроприборы'],
+  },
+  {
+    code:'SOP-003', name:'Прорыв стояка / затопление',
+    trigger:'Прорыв трубопровода, затопление МОП или квартир',
+    calls:[{num:'☎',label:'Аварийная служба'},{num:'103',label:'103 (ожоги ГВС)'}],
+    steps:[
+      {text:'ИК-термометром: ГВС или ХВС? ГВС > 50°C = ожоговая угроза.', urgent:true},
+      {text:'Перекрыть задвижку стояка в подвале (если безопасно).', urgent:true},
+      {text:'Вызвать аварийную сантехническую службу.'},
+      {text:'Уведомить жителей затопленных квартир.'},
+      {text:'Электрооборудование в воде — обесточить.'},
+      {text:'Составить акты ущерба по каждой квартире. Фото.'},
+    ],
+    dont:['Приближаться к прорыву ГВС без проверки температуры','Откладывать перекрытие стояка'],
+  },
+  {
+    code:'SOP-004', name:'Нет тепла при -10°C',
+    trigger:'Нет тепла в МКД + t° ниже -10°C на улице',
+    calls:[{num:'☎',label:'Теплосеть (диспетчер)'},{num:'112',label:'112 если нет ответа 30 мин'}],
+    steps:[
+      {text:'Проверить ИТП: давление и t° на вводе теплосети.'},
+      {text:'Немедленно позвонить диспетчеру теплосети. Зафиксировать время и ФИО.', urgent:true},
+      {text:'Уведомить ОСИ немедленно.'},
+      {text:'Контролировать t° в квартирах каждые 2 часа.'},
+      {text:'Нет ответа теплосети через 30 мин → вызвать 112.', urgent:true},
+      {text:'При t° в квартирах < +14°C → уведомить МЧС об уязвимых жителях.'},
+    ],
+    dont:['Ждать «само включится» при -10°C','Не контролировать температуру каждые 2 часа'],
+  },
+  {
+    code:'SOP-005', name:'Обесточивание МКД',
+    trigger:'Полное отсутствие электричества в МКД',
+    calls:[{num:'☎',label:'Энергосбыт (диспетчер)'},{num:'☎',label:'Лифтовая служба'}],
+    steps:[
+      {text:'Осмотреть ВРУ снаружи: нет дыма, запаха? Есть — SOP-001.', urgent:true},
+      {text:'Позвонить диспетчеру энергосбыта. Зафиксировать время.'},
+      {text:'Проверить нет ли застрявших в лифтах.'},
+      {text:'Зимой: немедленно проверить ИТП — без электричества насосы не работают.', urgent:true},
+      {text:'Уведомить жителей. Обеспечить освещение входов.'},
+    ],
+    dont:['Вмешиваться в ВРУ самостоятельно','Не проверять лифты на застрявших'],
+  },
+  {
+    code:'SOP-006', name:'Угроза обрушения',
+    trigger:'Прогиб, трещины в несущих конструкциях, треск',
+    calls:[{num:'112',label:'112 — МЧС'},{num:'☎',label:'ОСИ (председатель)'}],
+    steps:[
+      {text:'Немедленно покинуть опасную зону. Не оценивать.', urgent:true},
+      {text:'Вызвать 112 — МЧС.', urgent:true},
+      {text:'Оцепить зону: лента, знаки, живое оцепление.'},
+      {text:'Эвакуировать жителей из зоны риска.'},
+      {text:'Запретить вход до заключения эксперта.'},
+      {text:'Ждать строительного эксперта. Не принимать решений самостоятельно.', urgent:true},
+    ],
+    dont:['Самостоятельно оценивать несущую способность','Входить в зону для осмотра «поближе»'],
+  },
+  {
+    code:'SOP-007', name:'Лифт с пассажиром',
+    trigger:'Лифт застрял, внутри есть человек',
+    calls:[{num:'☎',label:'Лифтовая служба'},{num:'103',label:'103 (при плохом самочувствии)'}],
+    steps:[
+      {text:'Установить контакт с пассажиром через переговорное устройство.', urgent:true},
+      {text:'Успокоить: «Лифтовая служба вызвана. Не пытайтесь открыть двери».'},
+      {text:'Вызвать лифтовую службу. Назвать адрес, номер лифта, этаж.'},
+      {text:'При плохом самочувствии пассажира — 103 немедленно.'},
+      {text:'Не открывать двери шахты самостоятельно.', urgent:true},
+      {text:'Оставаться рядом. Контакт с пассажиром каждые 2–3 мин.'},
+    ],
+    dont:['Открывать двери шахты без лифтового механика','Оставлять пассажира без связи'],
+  },
+  {
+    code:'SOP-008', name:'Падение льда / наледь',
+    trigger:'Падение льда на человека или нависающая наледь',
+    calls:[{num:'103',label:'103 — Скорая (пострадавшие)'},{num:'112',label:'112 — МЧС'}],
+    steps:[
+      {text:'При пострадавшем: 103 немедленно.', urgent:true},
+      {text:'Не перемещать пострадавшего при травме головы.', urgent:true},
+      {text:'Оцепить зону под нависающей наледью немедленно.', urgent:true},
+      {text:'Уведомить ОСИ.'},
+      {text:'Фото с безопасного расстояния.'},
+      {text:'Вызвать спецподрядчика на удаление. Самому не скалывать.'},
+    ],
+    dont:['Самостоятельно скалывать наледь с высоты','Перемещать пострадавшего с травмой головы'],
+  },
+];
+
+const SYMPTOMS = [
+  {icon:'💧', domain:'roof', name:'Пятно на потолке (верхний этаж)', action:'Кровля или стояк', card:'ROOF-INS-002', sev:'L2',
+   resp:{osi:'Кровля и стояки до 1-го крана',owner:'Внутри квартиры после крана',hm:'Диагностика источника + акт'},
+   detail:{causes:['Засор воронки кровли','Разрушение примыкания к парапету','Протечка стояка ГВС/отопления','Межпанельный шов'],
+           steps:['Осмотр квартиры: размер, мокрое/сухое?','Проверить стояки на этаже ИК-термометром','Выйти на кровлю: воронки, примыкания','Если источник не найден — ECL-2, осмотр при дожде']}},
+  {icon:'💧', domain:'base', name:'Пятно на потолке (НЕ верхний этаж)', action:'Стояки ХВС/ГВС/отопления', card:'WATR-INS-003', sev:'L2',
+   resp:{osi:'Подвал и инженерные системы',owner:'Личные вещи и имущество',hm:'Диагностика + документирование'},
+   detail:{causes:['Течь стояка ХВС или ГВС выше','Прорыв подводки в квартире выше','Конденсат на трубах'],
+           steps:['Подняться на этаж выше — осмотр МОП','ИК-термометром: температура трубы?','Определить точку разграничения','Уведомить жителя квартиры выше']}},
+  {icon:'🌡', domain:'heat', name:'Холодно в квартире / нет тепла', action:'ИТП → стояк → квартира', card:'HEAT-INS-002', sev:'L2',
+   resp:{osi:'Стояки и ИТП до 1-го крана',owner:'Внутри квартиры (термостат, кран)',hm:'Диагностика источника + теплосеть'},
+   detail:{causes:['Недостаточная t° от теплосети','Воздушная пробка в стояке','Нарушение балансировки','Закрытый кран или термостат в квартире'],
+           steps:['ИТП: t° на подаче соответствует норме?','Стояк на этаже: ИК-термометром > 50°C?','Резкое падение t° на каком-то этаже = воздух','Стравить воздух через кран Маевского']}},
+  {icon:'🌡', domain:'heat', name:'Нет тепла во всём доме', action:'Теплосеть + МЧС при -10°C', card:'HEAT-INS-004', sev:'L3',
+   resp:{osi:'Стояки и ИТП до 1-го крана',owner:'Внутри квартиры (термостат, кран)',hm:'Диагностика источника + теплосеть'},
+   detail:{causes:['Авария на тепловой магистрали','Отказ насосов ИТП','Аварийное отключение электричества'],
+           steps:['Проверить ИТП: давление на вводе?','Немедленно звонить в теплосеть','При -10°C и нет ответа 30 мин — 112','Мониторинг t° в квартирах каждые 2 часа']}},
+  {icon:'🚿', domain:'watr', name:'Нет горячей воды / холодная ГВС', action:'ИТП → стояк ГВС', card:'WATR-INS-002', sev:'L2',
+   resp:{osi:'Стояки ХВС/ГВС до 1-го крана',owner:'Разводка после крана в квартире',hm:'Точка разграничения + акт'},
+   detail:{causes:['Остановка циркуляционного насоса ГВС','Недостаточная t° теплосети','Засор теплообменника'],
+           steps:['ИК-термометром: t° ГВС на стояке?','Норма: не менее 60°C','Проверить работу насоса ГВС в ИТП','При t° < 60°C — уведомить теплосеть письменно']}},
+  {icon:'🚿', domain:'watr', name:'Слабый напор воды', action:'Водомерный узел → фильтр', card:'WATR-INS-002', sev:'L2',
+   resp:{osi:'Стояки ХВС/ГВС до 1-го крана',owner:'Разводка после крана в квартире',hm:'Точка разграничения + акт'},
+   detail:{causes:['Засор фильтра-грязевика','Частично закрытая задвижка','Проблема на магистрали водоканала'],
+           steps:['Масштаб: весь дом / секция / квартира?','Водомерный узел: манометр до/после фильтра','Разница > 0,5 бар = засор фильтра','Задвижка стояка: открыта полностью?']}},
+  {icon:'💦', domain:'watr', name:'Течь трубы в МОП', action:'ИК-термометр → перекрыть', card:'WATR-INS-003', sev:'L2',
+   resp:{osi:'Стояки ХВС/ГВС до 1-го крана',owner:'Разводка после крана в квартире',hm:'Точка разграничения + акт'},
+   detail:{causes:['Коррозия резьбового соединения','Сквозная коррозия трубы','Механическое повреждение'],
+           steps:['ИК-термометром: t° в зоне течи ДО приближения','ХВС (холодная) или ГВС (горячая)?','При активной течи: перекрыть задвижку стояка','Подрядчик в день обращения']}},
+  {icon:'⚡', domain:'elec', name:'Нет освещения МОП', action:'Лампа → автомат → ВРУ', card:'ELEC-INS-002', sev:'L2',
+   resp:{osi:'Щитки и кабели МОП',owner:'Электрика внутри квартиры',hm:'Осмотр снаружи + электрик'},
+   detail:{causes:['Перегоревшая лампа (наиболее часто)','Выбитый автомат в щитке','Обрыв кабеля'],
+           steps:['Масштаб: один светильник / этаж / здание?','Один светильник: лампа перегорела?','Весь этаж: щиток снаружи — запах, тепло?','Вскрывать щиток самостоятельно запрещено']}},
+  {icon:'⚡', domain:'elec', name:'Дым / запах гари из щитка', action:'SOP-001 + электрик немедленно', card:'ELEC-INS-003', sev:'L3',
+   resp:{osi:'Щитки и кабели МОП',owner:'Электрика внутри квартиры',hm:'Осмотр снаружи + электрик'},
+   detail:{causes:['Горение изоляции','Дуговое замыкание','Перегрузка линии'],
+           steps:['НЕ открывать щиток — вспышка при притоке воздуха','101 (пожарные) + электрик немедленно','Обесточить питание щитка снаружи (если известно как)','Эвакуировать этаж']}},
+  {icon:'🌫', domain:'base', name:'Запах газа в подвале', action:'104 — не входить!', card:'BASE-INS-004', sev:'L3',
+   resp:{osi:'Подвал и инженерные системы',owner:'Личные вещи и имущество',hm:'Диагностика + документирование'},
+   detail:{causes:['Утечка газопровода','Накопление газа (тяжелее воздуха)'],
+           steps:['НЕ ВХОДИТЬ в подвал','НЕ включать/выключать свет','104 снаружи здания','Эвакуировать жителей нижних этажей']}},
+  {icon:'🌫', domain:'base', name:'Запах сырости из подвала', action:'Маска FFP2 → найти источник', card:'BASE-INS-004', sev:'L2',
+   resp:{osi:'Подвал и инженерные системы',owner:'Личные вещи и имущество',hm:'Диагностика + документирование'},
+   detail:{causes:['Плесень и грибок','Подтопление','Протечка трубопровода'],
+           steps:['FFP2 маска до входа','Осмотр: вода на полу? Плесень на стенах?','Найти источник влаги','Площадь плесени > 0,5 кв.м — ограничить время']}},
+  {icon:'💦', domain:'base', name:'Вода в подвале', action:'Источник → перекрыть/откачать', card:'BASE-INS-002', sev:'L2',
+   resp:{osi:'Подвал и инженерные системы',owner:'Личные вещи и имущество',hm:'Диагностика + документирование'},
+   detail:{causes:['Прорыв трубопровода','Паводок (март–апрель)','Нарушение дренажа'],
+           steps:['Safety: газ? канализация? электрика?','Уровень воды: нарастает или нет?','Установить источник до откачки','Прорыв трубы → перекрыть ввод']}},
+  {icon:'🏗', domain:'roof', name:'Много снега / наледь на кровле', action:'Оцепление → спецподрядчик', card:'ROOF-INS-004', sev:'L2',
+   resp:{osi:'Кровля МКД',owner:'Квартира после 1-го крана',hm:'Осмотр + акт + подрядчик'},
+   detail:{causes:['Тепловые потери через кровлю','Цикличный перепад температур'],
+           steps:['Оцепить зону под карнизом ДО выхода на кровлю','Осмотр с земли (бинокль)','Нависающий лёд над людьми → L2 немедленно','Спецподрядчик — хаузмастер не скалывает сам']}},
+  {icon:'🏗', domain:'roof', name:'Трещины в стенах / перекрытии', action:'112 + строительная экспертиза', card:'EMRG-SOP-006', sev:'L3',
+   resp:{osi:'Кровля МКД',owner:'Квартира после 1-го крана',hm:'Осмотр + акт + подрядчик'},
+   detail:{causes:['Просадка фундамента','Перегрузка конструкции','Износ несущих элементов'],
+           steps:['Немедленно покинуть зону','Вызвать 112','Поставить маяк на трещину (маркер + дата)','Запрет входа до экспертизы']}},
+  {icon:'🚁', domain:'base', name:'Лифт не работает / застрял', action:'Лифтовая служба → пассажир?', card:'EMRG-SOP-007', sev:'L2',
+   resp:{osi:'Подвал и инженерные системы',owner:'Личные вещи и имущество',hm:'Диагностика + документирование'},
+   detail:{causes:['Технический сбой','Аварийное отключение электричества','Механическая неисправность'],
+           steps:['Установить: есть ли пассажир внутри?','Контакт через переговорное устройство','Вызвать лифтовую службу','Не открывать двери шахты самостоятельно']}},
+  {icon:'🌡', domain:'roof', name:'Протечка кровли — мокрый потолок', action:'Кровля — воронки и примыкания', card:'ROOF-INS-002', sev:'L2',
+   resp:{osi:'Кровля МКД',owner:'Квартира после 1-го крана',hm:'Осмотр + акт + подрядчик'},
+   detail:{causes:['Засор воронки','Разрушение примыкания к парапету','Ледяная пробка зимой'],
+           steps:['Safety check перед выходом на кровлю','Сначала воронки — засор или лёд?','Примыкания к парапетам по периметру','Источник почти всегда НЕ над пятном']}},
+];
+
+const CHECKLIST_DOMAINS = [
+  {
+    key:'roof', label:'ROOF', color:'var(--roof)',
+    items:[
+      {text:'Воронки: проходимость, нет засора/льда', v2:'ROOF-L2-004'},
+      {text:'Примыкания к парапетам: герметик цел', v2:'ROOF-L2-007'},
+      {text:'Поле кровли: нет вздутий, нет разрывов', v2:'ROOF-L2-002'},
+      {text:'Парапетный металл: не оторван, нет ржавчины', v2:'ROOF-L2-003'},
+      {text:'Шахты и вентканалы: примыкания герметичны', v2:'ROOF-L2-007'},
+      {text:'Снеговая нагрузка (зима): в норме', v2:'ROOF-L2-006'},
+    ]
+  },
+  {
+    key:'base', label:'BASE', color:'var(--base)',
+    items:[
+      {text:'Вода на полу: нет стоячей воды', v2:'BASE-L2-001'},
+      {text:'Запах при входе: нет газа, нет резкой сырости', v2:'BASE-L3-002'},
+      {text:'Трубопроводы: коррозия не выше стадии 2', v2:'BASE-L2-003'},
+      {text:'Изоляция трубопроводов: цела', v2:'BASE-L2-005'},
+      {text:'Запорная арматура на вводах: работает', v2:'BASE-L1-004'},
+      {text:'Плесень на стенах: нет очагов > 0,5 кв.м', v2:'BASE-L1-006'},
+    ]
+  },
+  {
+    key:'heat', label:'HEAT', color:'var(--heat)',
+    items:[
+      {text:'Давление на манометрах ИТП: в норме', v2:'HEAT-L2-003'},
+      {text:'Температура на ИТП: соответствует сезону', v2:'HEAT-L2-001'},
+      {text:'Грязевик ИТП: нет засора', v2:'HEAT-L1-007'},
+      {text:'Насосы ИТП: работают (гул, вибрация)', v2:'HEAT-L2-003'},
+      {text:'Стояки отопления: прогрев равномерный', v2:'HEAT-L2-001'},
+      {text:'Течей на ИТП и стояках: нет', v2:'HEAT-L2-003'},
+    ]
+  },
+  {
+    key:'watr', label:'WATR', color:'var(--watr)',
+    items:[
+      {text:'Счётчик ХВС: показания сняты', v2:'WATR-L1-001'},
+      {text:'Пломба счётчика: цела', v2:'WATR-L1-001'},
+      {text:'Срок поверки счётчика: не просрочен', v2:'WATR-L1-007'},
+      {text:'Задвижка ввода ХВС: работает', v2:'WATR-L1-001'},
+      {text:'t° ГВС на стояке: не ниже 60°C', v2:'WATR-L1-005'},
+      {text:'Течей на стояках ХВС/ГВС: нет', v2:'WATR-L2-004'},
+    ]
+  },
+  {
+    key:'elec', label:'ELEC', color:'var(--elec)',
+    items:[
+      {text:'ВРУ: нет запаха гари, нет следов копоти', v2:'ELEC-L3-001'},
+      {text:'Этажные щитки: нет запаха, нормальная t°', v2:'ELEC-L2-002'},
+      {text:'Освещение МОП: работает на всех этажах', v2:'ELEC-L2-001'},
+      {text:'Противопожарные светильники: работают', v2:'ELEC-L1-004'},
+      {text:'Кабели МОП: нет видимых повреждений', v2:'ELEC-L2-005'},
+      {text:'Наружное освещение: работает', v2:'ELEC-L2-001'},
+    ]
+  },
+];
+
+const GLOSSARY = [
+  {a:'ИТП', ru:'Индивидуальный тепловой пункт', kz:'Жеке жылу торабы', d:'Узел передачи тепла от теплосети в систему МКД'},
+  {a:'ВРУ', ru:'Вводное распределительное устройство', kz:'Кіріс бөлу қондырғысы', d:'Главный электрический щит МКД на вводе'},
+  {a:'ХВС', ru:'Холодное водоснабжение', kz:'Суық су жабдықтау', d:'Система подачи холодной воды'},
+  {a:'ГВС', ru:'Горячее водоснабжение', kz:'Ыстық су жабдықтау', d:'Система подачи горячей воды (≥ 60°C)'},
+  {a:'МКД', ru:'Многоквартирный дом', kz:'Көп пәтерлі тұрғын үй', d:'Жилое здание с несколькими квартирами'},
+  {a:'МОП', ru:'Места общего пользования', kz:'Жалпы пайдаланылатын орындар', d:'Подъезды, лестницы, лифты, подвал, кровля'},
+  {a:'ОСИ', ru:'Объединение собственников имущества', kz:'Мүлік иелерінің бірлестігі', d:'Форма управления МКД в РК'},
+  {a:'ECL', ru:'Уровень уверенности диагноза', kz:'Дәлелдеу сенімділік деңгейі', d:'1 — гипотеза, 2 — вероятно, 3 — визуально, 4 — инструментально'},
+  {a:'IDI', ru:'Индекс сложности осмотра', kz:'Тексеру күрделілік индексі', d:'1 — хаузмастер сам, 4 — только аварийные службы'},
+  {a:'ITS', ru:'Стандарт времени осмотра', kz:'Тексеру уақыты стандарты', d:'Минимальное время качественного осмотра'},
+  {a:'SLA', ru:'Максимальное время реагирования', kz:'Қызмет деңгейі келісімі', d:'L1: 5–10 р.д. / L2: 24 ч / L3: 1–2 ч'},
+  {a:'CAPEX', ru:'Капитальные затраты', kz:'Күрделі шығындар', d:'Замена системы или элемента, а не текущий ремонт'},
+  {a:'OPEX', ru:'Операционные расходы', kz:'Операциялық шығындар', d:'Текущее техническое обслуживание и ремонт'},
+  {a:'RCA', ru:'Анализ первопричины', kz:'Түбегейлі себептерді талдау', d:'Поиск и устранение причины, а не симптома'},
+  {a:'L1', ru:'Плановый уровень', kz:'Жоспарлы деңгей', d:'Нет угрозы безопасности, SLA 5–10 рабочих дней'},
+  {a:'L2', ru:'Срочный уровень', kz:'Шұғыл деңгей', d:'Нарушение комфорта / риск нарастания, SLA ≤ 24 ч'},
+  {a:'L3', ru:'Аварийный уровень', kz:'Авариялық деңгей', d:'Угроза жизни или конструкции, SLA ≤ 1–2 ч'},
+  {a:'Парапет', ru:'Парапет кровли', kz:'Парапет', d:'Ограждающая стенка по периметру плоской кровли'},
+  {a:'Примыкание', ru:'Примыкание', kz:'Жалғасу', d:'Место соединения кровельного покрытия со стеной или конструкцией'},
+  {a:'Воронка', ru:'Водосточная воронка', kz:'Су ағызу шұңқыры', d:'Приёмник воды на плоской кровле'},
+  {a:'Высолы', ru:'Высолы', kz:'Тұздану', d:'Белые соляные пятна — признак намокания конструкций'},
+  {a:'Стояк', ru:'Стояк', kz:'Тік құбыр', d:'Вертикальный трубопровод в МКД'},
+  {a:'Лежак', ru:'Лежак (канализация)', kz:'Көлденең құбыр', d:'Горизонтальный трубопровод в подвале'},
+  {a:'Грязевик', ru:'Грязевик / фильтр', kz:'Тазартқыш / сүзгі', d:'Фильтр на вводе трубопровода'},
+  {a:'Теплоноситель', ru:'Теплоноситель', kz:'Жылу тасымалдаушы', d:'Горячая вода в системе отопления'},
+  {a:'Балансировка', ru:'Балансировка системы', kz:'Жүйені теңестіру', d:'Регулировка расхода теплоносителя по стоякам'},
+  {a:'Маяк', ru:'Маяк на трещине', kz:'Жарықтағы бақылаушы', d:'Гипсовая или бумажная метка для контроля динамики трещины'},
+  {a:'СОП', ru:'Стандартная операционная процедура', kz:'Стандартты операциялық рәсім', d:'Аварийный регламент действий'},
+];
+
+const SEASONS = [
+  {
+    name:'Зима', months:'Ноябрь — Март', color:'#1B3A5C',
+    items:['Еженедельный контроль снеговой нагрузки на кровле','Осмотр воронок на предмет ледяных пробок','Контроль параметров ИТП (давление, температура)','Проверка прогрева всех стояков после оттепели','Осмотр подвала на промерзание трубопроводов','Контроль доводчиков входных дверей'],
+    risks:['Снег > 30 см → срочная уборка (ROOF-L2-006)','Нет тепла при -10°C → L3 немедленно','Наледь у карниза → оцепление + L2'],
+  },
+  {
+    name:'Весна', months:'Март — Май', color:'#1E7A4B',
+    items:['Превентивный осмотр подвала до 1 марта (паводок!)','Прочистка воронок до начала снеготаяния','Плановый осмотр кровли после зимы (март–апрель)','Проверка дренажных систем и приямков','Осмотр фасада на трещины после морозов','Очистка ливнеприёмников'],
+    risks:['Затопление подвала → откачка + источник','Разрывы покрытия после зимы → L2'],
+  },
+  {
+    name:'Лето', months:'Июнь — Август', color:'#8B6914',
+    items:['Промывка и дезинфекция системы ГВС (июль)','Плановый осмотр ИТП в межсезон','Промывка и опрессовка системы отопления (август)','Ремонт кровельного покрытия (t° > +15°C)','Герметизация межпанельных швов','Осмотр кабелей наружного освещения'],
+    risks:['ГВС < 50°C → L2 (WATR-L2-003)','Дефекты при промывке ИТП → CAPEX-оценка'],
+  },
+  {
+    name:'Осень', months:'Сентябрь — Октябрь', color:'#5D4037',
+    items:['До 15 сентября: полный осмотр кровли (обязательно)','До 1 октября: прочистка воронок от листвы','До 1 октября: проверка готовности ИТП к сезону','Октябрь: контроль пуска тепла и прогрева стояков','Проверка доводчиков входных дверей до холодов','Акт готовности МКД к зиме'],
+    risks:['Неготовность ИТП → подрядчик до сезона','Разрушение швов → герметизация до морозов'],
+  },
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let checkState = {};
+let currentDomain = 'roof';
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function renderContacts(){
+  const el = document.getElementById('contacts-list');
+  el.innerHTML = CONTACTS.map(c=>`
+    <div class="contact-row">
+      <div class="contact-num" style="font-size:20px;font-weight:900;color:var(--emrg);min-width:50px">${c.num}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-when">${c.when}</div>
+      </div>
+      <a class="call-btn" href="javascript:void(0)" onclick="handleCall(event,'${c.num}')" data-tip="Нажми для звонка: ${c.num}" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:var(--emrg);color:white;border-radius:10px;font-size:20px;box-shadow:0 2px 8px rgba(127,0,0,0.4)">📞</a>
+    </div>
+  `).join('');
+}
+
+function renderSops(filter=''){
+  const el = document.getElementById('sop-list');
+  const filtered = SOPS.filter(s=>
+    !filter || s.name.toLowerCase().includes(filter.toLowerCase()) ||
+    s.trigger.toLowerCase().includes(filter.toLowerCase())
+  );
+  if(!filtered.length){ el.innerHTML='<div class="no-results">Ничего не найдено</div>'; return; }
+  el.innerHTML = filtered.map(s=>`
+    <div class="emrg-card" onclick="showSopModal('${s.code}')">
+      <div class="emrg-header">
+        <div class="emrg-code">${s.code}</div>
+        <div class="emrg-name">${s.name}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.3">${s.trigger}</div>
+      </div>
+      <div class="emrg-calls" onclick="event.stopPropagation()">
+        ${s.calls.map((c,i)=>`<button class="emrg-call-btn ${i===0?'emrg-call-primary':''}"
+          onclick="handleCall(event,'${c.num}')"
+          data-tip="Набрать ${c.num}"
+          style="border:none;cursor:pointer">${c.label}</button>`).join('')}
+      </div>
+      <div style="padding:6px 16px 12px;display:flex;align-items:center;justify-content:flex-end">
+        <span style="font-size:12px;color:rgba(255,255,255,0.5);font-style:italic">Нажми для регламента →</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showSopModal(code){
+  const sop = SOPS.find(x=>x.code===code);
+  if(!sop) return;
+
+  // Build calls HTML without nested template literals
+  const callsHTML = sop.calls.map(function(c,i){
+    const isPrimary = i===0;
+    const bg = isPrimary ? 'var(--emrg)' : 'var(--light)';
+    const col = isPrimary ? 'white' : 'var(--navy)';
+    return '<button onclick="handleCall(event,\''+c.num+'\')" '
+      + 'style="background:'+bg+';color:'+col+';border:none;border-radius:8px;'
+      + 'padding:10px 16px;font-weight:800;font-size:15px;cursor:pointer;'
+      + 'box-shadow:0 2px 6px rgba(0,0,0,0.15)">'
+      + c.label + '</button>';
+  }).join('');
+
+  // Build steps HTML
+  const stepsHTML = sop.steps.map(function(st,i){
+    const urgentNum = st.urgent ? 'background:#CC0000' : 'background:var(--navy)';
+    const urgentTxt = st.urgent ? 'color:var(--emrg);font-weight:700' : 'color:var(--text)';
+    return '<div class="emrg-step">'
+      + '<div class="step-num" style="'+urgentNum+'">'+(i+1)+'</div>'
+      + '<div class="step-text" style="'+urgentTxt+'">'+st.text+'</div>'
+      + '</div>';
+  }).join('');
+
+  // Build dont HTML
+  const dontHTML = sop.dont.map(function(d){
+    return '<div class="dont-item">'+d+'</div>';
+  }).join('');
+
+  const inner = document.getElementById('modal-inner');
+  inner.innerHTML =
+    '<div class="modal-handle"></div>'
+    + '<div class="modal-header">'
+    +   '<div style="font-size:11px;color:var(--emrg);font-weight:700;letter-spacing:0.5px;margin-bottom:4px">'+sop.code+'  ·  АВАРИЙНЫЙ РЕГЛАМЕНТ</div>'
+    +   '<div class="modal-title">'+sop.name+'</div>'
+    +   '<div class="modal-sub">'+sop.trigger+'</div>'
+    + '</div>'
+    + '<div class="modal-section">'
+    +   '<div class="modal-label">Вызвать</div>'
+    +   '<div style="display:flex;gap:8px;flex-wrap:wrap">'+callsHTML+'</div>'
+    + '</div>'
+    + '<div class="modal-section">'
+    +   '<div class="modal-label">Алгоритм действий</div>'
+    +   stepsHTML
+    + '</div>'
+    + '<div class="modal-section">'
+    +   '<div class="emrg-dont" style="border-radius:8px">'
+    +     '<div class="emrg-dont-title">ЗАПРЕЩЕНО</div>'
+    +     dontHTML
+    +   '</div>'
+    + '</div>'
+    + '<div style="padding:0 16px 16px">'
+    +   '<button class="modal-close" onclick="closeModalBtn()">Закрыть</button>'
+    + '</div>';
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function renderSymptoms(filter=''){
+  const el = document.getElementById('symptom-list');
+  const filtered = SYMPTOMS.filter(s=>
+    !filter || s.name.toLowerCase().includes(filter.toLowerCase()) ||
+    s.action.toLowerCase().includes(filter.toLowerCase())
+  );
+  if(!filtered.length){ el.innerHTML='<div class="no-results">Симптом не найден<br><button class="reset-btn" onclick="clearSearch(\'sym\')">Очистить поиск</button></div>'; return; }
+  el.innerHTML = filtered.map((s,i)=>`
+    <div class="symptom-item" onclick="showSymptomModal(${i})">
+      <div class="symptom-domain dom-${s.domain}" style="background:var(--${s.domain})">${s.icon}</div>
+      <div class="symptom-text">
+        <div class="symptom-name">${s.name}</div>
+        <div class="symptom-action">${s.action} · <span class="sev-${s.sev.toLowerCase()}" style="font-size:11px;font-weight:700;padding:1px 5px;border-radius:4px">${s.sev}</span></div>
+      </div>
+      <div class="symptom-arrow" style="color:#CCC;font-size:16px">›</div>
+    </div>
+  `).join('');
+}
+
+// Map card codes to checklist domain keys
+const CARD_TO_DOMAIN = {
+  'ROOF-INS-001':'roof','ROOF-INS-002':'roof','ROOF-INS-003':'roof',
+  'ROOF-INS-004':'roof','ROOF-INS-005':'roof',
+  'BASE-INS-001':'base','BASE-INS-002':'base','BASE-INS-003':'base','BASE-INS-004':'base',
+  'HEAT-INS-001':'heat','HEAT-INS-002':'heat','HEAT-INS-003':'heat','HEAT-INS-004':'heat',
+  'WATR-INS-001':'watr','WATR-INS-002':'watr','WATR-INS-003':'watr',
+  'ELEC-INS-001':'elec','ELEC-INS-002':'elec','ELEC-INS-003':'elec',
+};
+
+// Severity descriptions for L-badge navigation
+const SEV_INFO = {
+  'L1': {label:'L1 — Плановый', color:'var(--green)', bg:'var(--l1)', sla:'5–10 рабочих дней', desc:'Нет угрозы безопасности. Плановое ТО или незначительный дефект.', action:'Зафиксировать. Создать заявку. Плановый ремонт.'},
+  'L2': {label:'L2 — Срочный',  color:'#8B6914',      bg:'var(--l2)', sla:'≤ 24 часа',         desc:'Нарушение комфорта жителей или риск нарастания в аварию.', action:'Выезд. Подрядчик. Уведомить ОСИ.'},
+  'L3': {label:'L3 — Аварийный',color:'var(--red)',   bg:'var(--l3)', sla:'1–2 часа',           desc:'Угроза жизни или несущим конструкциям.', action:'Вызов служб. Эвакуация. ОСИ немедленно.'},
+};
+
+function goToChecklist(domainKey){
+  closeModalBtn();
+  selectDomain(domainKey);
+  showPage('checks');
+}
+
+function showSevInfo(sev){
+  const info = SEV_INFO[sev];
+  if(!info) return;
+  // Swap modal content to sev info, keep overlay open
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" style="color:${info.color}">${info.label}</div>
+      <div class="modal-sub">SLA реагирования: <strong>${info.sla}</strong></div>
+    </div>
+    <div class="modal-section">
+      <div style="background:${info.bg};border-radius:10px;padding:14px 16px;margin-bottom:10px">
+        <div style="font-size:13px;color:${info.color};font-weight:700;margin-bottom:4px">ОПРЕДЕЛЕНИЕ</div>
+        <div style="font-size:14px;line-height:1.5">${info.desc}</div>
+      </div>
+      <div style="background:var(--light);border-radius:10px;padding:14px 16px">
+        <div style="font-size:13px;color:var(--navy);font-weight:700;margin-bottom:4px">ПЕРВОЕ ДЕЙСТВИЕ</div>
+        <div style="font-size:14px;line-height:1.5">${info.action}</div>
+      </div>
+    </div>
+    <div style="padding:0 16px 8px">
+      <button class="modal-close" onclick="closeModalBtn()">Понятно</button>
+    </div>
+  `;
+}
+
+function showSymptomModal(idx){
+  const s = SYMPTOMS.find((_,i)=>i===idx) || SYMPTOMS[idx];
+  if(!s) return;
+  const domKey = CARD_TO_DOMAIN[s.card] || null;
+  const sevInfo = SEV_INFO[s.sev];
+
+  const inner = document.getElementById('modal-inner');
+  inner.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div style="font-size:28px;margin-bottom:6px">${s.icon}</div>
+      <div class="modal-title">${s.name}</div>
+      <div class="modal-sub">${s.action}</div>
+      <div class="badge-row" style="margin-top:10px">
+        <button
+          onclick="goToChecklist('${domKey}')"
+          data-tip="Открыть чек-лист ${s.card}"
+          style="background:var(--light);color:var(--blue);border:1.5px solid var(--blue);
+                 border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;
+                 cursor:pointer;transition:background 0.15s;letter-spacing:0.3px"
+          onmouseover="this.style.background='var(--blue)';this.style.color='white'"
+          onmouseout="this.style.background='var(--light)';this.style.color='var(--blue)'"
+          onmousedown="this.style.transform='scale(0.96)'"
+          onmouseup="this.style.transform='scale(1)'"
+        >${s.card} ↗</button>
+        <button
+          onclick="showSevInfo('${s.sev}')"
+          data-tip="${sevInfo ? sevInfo.label + ' · SLA ' + sevInfo.sla : s.sev}"
+          style="background:${s.sev==='L3'?'var(--l3)':s.sev==='L2'?'var(--l2)':'var(--l1)'};
+                 color:${s.sev==='L3'?'var(--red)':s.sev==='L2'?'#8B6914':'var(--green)'};
+                 border:1.5px solid ${s.sev==='L3'?'var(--red)':s.sev==='L2'?'#C9A227':'var(--green)'};
+                 border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;
+                 cursor:pointer;transition:opacity 0.15s;letter-spacing:0.3px"
+          onmouseover="this.style.opacity='0.75'"
+          onmouseout="this.style.opacity='1'"
+          onmousedown="this.style.transform='scale(0.96)'"
+          onmouseup="this.style.transform='scale(1)'"
+        >${s.sev} ↗</button>
+      </div>
+    </div>
+    ${s.resp ? `<div class="modal-section">
+      <div class="modal-label">Зона ответственности</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="background:var(--light);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:16px">🏢</div>
+          <div style="font-size:10px;font-weight:800;color:var(--navy);margin:3px 0 2px;letter-spacing:0.3px">ОСИ</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.3">${s.resp.osi}</div>
+        </div>
+        <div style="background:var(--l1);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:16px">🧰</div>
+          <div style="font-size:10px;font-weight:800;color:var(--green);margin:3px 0 2px;letter-spacing:0.3px">ХАУЗМАСТЕР</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.3">${s.resp.hm}</div>
+        </div>
+        <div style="background:var(--l2);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:16px">👤</div>
+          <div style="font-size:10px;font-weight:800;color:#8B6914;margin:3px 0 2px;letter-spacing:0.3px">ЖИТЕЛЬ</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.3">${s.resp.owner}</div>
+        </div>
+      </div>
+    </div>` : ''}
+    <div class="modal-section">
+      <div class="modal-label">Возможные причины</div>
+      <ul class="modal-list">${s.detail.causes.map(c=>`<li>${c}</li>`).join('')}</ul>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Алгоритм осмотра</div>
+      ${s.detail.steps.map((st,i)=>`
+        <div class="emrg-step">
+          <div class="step-num" style="background:var(--navy)">${i+1}</div>
+          <div class="step-text">${st}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="modal-section" style="padding-bottom:4px">
+      <div class="modal-label">Действия</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+        <button onclick="actionPhoto()" style="${ACT_BTN_STYLE}#1A3A2A">
+          <span style="font-size:20px">📷</span>
+          <span style="font-size:11px;font-weight:700">Фото</span>
+        </button>
+        <button onclick="actionVideo()" style="${ACT_BTN_STYLE}#0D3B6E">
+          <span style="font-size:20px">🎥</span>
+          <span style="font-size:11px;font-weight:700">Видео</span>
+        </button>
+        <button onclick="actionSave('${s.name}','${s.card}','${s.sev}',\`${s.detail.causes.join(' / ')}\`,\`${s.detail.steps.join(' → ')}\`)" style="${ACT_BTN_STYLE}#1B3A5C">
+          <span style="font-size:20px">💾</span>
+          <span style="font-size:11px;font-weight:700">Сохранить</span>
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">
+        <button onclick="actionShare('${s.name}','${s.card}','${s.sev}',\`${s.detail.causes.join(', ')}\`,\`${s.detail.steps.join('. ')}\`,'share')" style="${ACT_BTN_STYLE}#4A7FA5">
+          <span style="font-size:18px">📤</span>
+          <span style="font-size:10px;font-weight:700">Отправить</span>
+        </button>
+        <button onclick="actionShare('${s.name}','${s.card}','${s.sev}',\`${s.detail.causes.join(', ')}\`,\`${s.detail.steps.join('. ')}\`,'whatsapp')" style="${ACT_BTN_STYLE}#1E7A4B">
+          <span style="font-size:18px">💬</span>
+          <span style="font-size:10px;font-weight:700">WhatsApp</span>
+        </button>
+        <button onclick="actionShare('${s.name}','${s.card}','${s.sev}',\`${s.detail.causes.join(', ')}\`,\`${s.detail.steps.join('. ')}\`,'telegram')" style="${ACT_BTN_STYLE}#0D3B6E">
+          <span style="font-size:18px">✈️</span>
+          <span style="font-size:10px;font-weight:700">Telegram</span>
+        </button>
+        <button onclick="actionOSI('${s.name}','${s.card}','${s.sev}')" style="${ACT_BTN_STYLE}#7B1A1A">
+          <span style="font-size:18px">🏢</span>
+          <span style="font-size:10px;font-weight:700">Председатель</span>
+        </button>
+      </div>
+    </div>
+    <div style="padding:8px 16px 16px">
+      <button class="modal-close" onclick="closeModalBtn()">Закрыть</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// ─── ACTION BUTTONS STYLE ─────────────────────────────────────────────────
+const ACT_BTN_STYLE = `
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;border:none;border-radius:10px;padding:10px 4px;cursor:pointer;
+  color:white;background:`;
+
+// ─── PHOTO ────────────────────────────────────────────────────────────────
+function actionPhoto(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';  // rear camera
+  input.onchange = (e)=>{
+    const file = e.target.files[0];
+    if(file) showCallToast('📷 Фото сделано: ' + file.name);
+  };
+  input.click();
+}
+
+// ─── VIDEO ────────────────────────────────────────────────────────────────
+function actionVideo(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'video/*';
+  input.capture = 'environment';
+  input.onchange = (e)=>{
+    const file = e.target.files[0];
+    if(file) showCallToast('🎥 Видео записано: ' + file.name);
+  };
+  input.click();
+}
+
+// ─── SAVE AS FILE ─────────────────────────────────────────────────────────
+function actionSave(name, card, sev, causes, steps){
+  const activeMkd = getActiveMKD();
+  const contract = activeMkd ? activeMkd.contract : (localStorage.getItem('hm_contract')||'б/н');
+  const mkdAddr  = activeMkd ? activeMkd.address  : (localStorage.getItem('hm_address')||'МКД не указан');
+  const now = new Date().toLocaleString('ru-RU');
+
+  const text =
+`ХАУЗМАСТЕР — КАРТОЧКА ОСМОТРА
+═══════════════════════════════
+Дата: ${now}
+МКД: ${mkdAddr}
+Контракт: ${contract}
+Код: ${card}  |  Severity: ${sev}
+Симптом: ${name}
+
+ВОЗМОЖНЫЕ ПРИЧИНЫ:
+${causes.split(' / ').map((c,i)=>`${i+1}. ${c}`).join('\n')}
+
+АЛГОРИТМ ОСМОТРА:
+${steps.split(' → ').map((s,i)=>`${i+1}. ${s}`).join('\n')}
+
+═══════════════════════════════
+Система ОСИ РК | housemaster-pwa`;
+
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${card}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  // Save to request history
+  saveRequest(name, card, sev, mkdAddr, contract);
+  showCallToast('💾 Сохранено в карточке и истории');
+}
+
+// ─── SHARE / WHATSAPP / TELEGRAM ─────────────────────────────────────────
+function actionShare(name, card, sev, causes, steps, target){
+  const contract = localStorage.getItem('hm_contract') || 'б/н';
+  const now = new Date().toLocaleString('ru-RU');
+  const msg = encodeURIComponent(
+`🏠 ХАУЗМАСТЕР | ${card} | ${sev}
+📋 Симптом: ${name}
+📄 Контракт: ${contract}
+🕐 ${now}
+
+🔍 Причины: ${causes}
+📌 Алгоритм: ${steps}
+
+Система ОСИ РК`);
+
+  if(target === 'whatsapp'){
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+  } else if(target === 'telegram'){
+    window.open(`https://t.me/share/url?url=&text=${msg}`, '_blank');
+  } else {
+    // Native share API — falls back to copy
+    if(navigator.share){
+      navigator.share({
+        title: `Хаузмастер — ${card}`,
+        text: decodeURIComponent(msg),
+      }).catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(decodeURIComponent(msg))
+        .then(()=> showCallToast('📋 Текст скопирован в буфер'))
+        .catch(()=> showCallToast('📤 Скопируй вручную'));
+    }
+  }
+}
+
+// ─── OSI CHAIRMAN ─────────────────────────────────────────────────────────
+function actionOSI(name, card, sev){
+  const savedPhone = localStorage.getItem('hm_osi_phone');
+  const savedContract = localStorage.getItem('hm_contract');
+
+  if(!savedPhone){
+    showOSISetup(name, card, sev);
+    return;
+  }
+  sendToOSI(savedPhone, savedContract, name, card, sev);
+}
+
+function showOSISetup(name, card, sev){
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div style="font-size:28px;margin-bottom:6px">🏢</div>
+      <div class="modal-title">Настройка председателя ОСИ</div>
+      <div class="modal-sub">Данные сохранятся — вводить один раз</div>
+    </div>
+    <div class="modal-section">
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Номер телефона председателя</div>
+        <input id="osi-phone" type="tel" placeholder="+7 (___) ___-__-__"
+          value="${localStorage.getItem('hm_osi_phone')||''}"
+          style="width:100%;padding:12px 14px;border:1.5px solid #E0E0E0;border-radius:10px;
+                 font-size:16px;outline:none;font-family:inherit;transition:border-color 0.15s"
+          onfocus="this.style.borderColor='var(--blue)'"
+          onblur="this.style.borderColor='#E0E0E0'">
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">ID контракта на обслуживание МКД</div>
+        <input id="osi-contract" type="text" placeholder="Например: КЗ-2024-СМЙ-042"
+          value="${localStorage.getItem('hm_contract')||''}"
+          style="width:100%;padding:12px 14px;border:1.5px solid #E0E0E0;border-radius:10px;
+                 font-size:16px;outline:none;font-family:inherit;transition:border-color 0.15s"
+          onfocus="this.style.borderColor='var(--blue)'"
+          onblur="this.style.borderColor='#E0E0E0'">
+      </div>
+    </div>
+    <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:8px">
+      <button onclick="saveOSISettings('${name}','${card}','${sev}')"
+        style="width:100%;padding:14px;background:var(--navy);color:white;border:none;
+               border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">
+        Сохранить и уведомить председателя
+      </button>
+      <button onclick="closeModalBtn()"
+        style="width:100%;padding:12px;background:var(--light);color:var(--navy);border:none;
+               border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">
+        Отмена
+      </button>
+    </div>
+  `;
+}
+
+function saveOSISettings(name, card, sev){
+  const phone = document.getElementById('osi-phone').value.trim();
+  const contract = document.getElementById('osi-contract').value.trim();
+
+  if(!phone){
+    document.getElementById('osi-phone').style.borderColor = 'var(--red)';
+    showCallToast('⚠ Введите номер телефона');
+    return;
+  }
+  localStorage.setItem('hm_osi_phone', phone);
+  if(contract) localStorage.setItem('hm_contract', contract);
+  showCallToast('✅ Данные сохранены');
+  sendToOSI(phone, contract, name, card, sev);
+}
+
+function sendToOSI(phone, contract, name, card, sev){
+  const now = new Date().toLocaleString('ru-RU');
+  const msg = encodeURIComponent(
+`🏠 ХАУЗМАСТЕР | Уведомление
+──────────────────
+📋 ${card} | ${sev}
+🔍 Симптом: ${name}
+📄 Контракт: ${contract || 'б/н'}
+🕐 ${now}
+──────────────────
+Система ОСИ РК`);
+
+  // Clean phone number for tel/wa
+  const cleanPhone = phone.replace(/\D/g,'');
+
+  // Show choice: call or WhatsApp
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div style="font-size:28px;margin-bottom:6px">🏢</div>
+      <div class="modal-title">Уведомить председателя</div>
+      <div class="modal-sub">${phone}${contract ? ' · Контракт: ' + contract : ''}</div>
+    </div>
+    <div style="padding:0 16px 8px;display:flex;flex-direction:column;gap:10px">
+      <a href="javascript:void(0)"
+        onclick="handleCall(event,'${phone}')"
+        style="display:flex;align-items:center;justify-content:center;gap:10px;
+               padding:14px;background:var(--navy);color:white;border-radius:10px;
+               text-decoration:none;font-size:15px;font-weight:700">
+        📞 Позвонить председателю
+      </a>
+      <a href="https://wa.me/${cleanPhone}?text=${msg}" target="_blank"
+        style="display:flex;align-items:center;justify-content:center;gap:10px;
+               padding:14px;background:#1E7A4B;color:white;border-radius:10px;
+               text-decoration:none;font-size:15px;font-weight:700">
+        💬 Написать в WhatsApp
+      </a>
+      <a href="https://t.me/+${cleanPhone}?text=${msg}" target="_blank"
+        style="display:flex;align-items:center;justify-content:center;gap:10px;
+               padding:14px;background:#0D3B6E;color:white;border-radius:10px;
+               text-decoration:none;font-size:15px;font-weight:700">
+        ✈️ Написать в Telegram
+      </a>
+      <button onclick="showOSISetup('${name}','${card}','${sev}')"
+        style="padding:11px;background:var(--light);color:var(--muted);border:none;
+               border-radius:10px;font-size:13px;cursor:pointer">
+        ✏️ Изменить номер / контракт
+      </button>
+      <button onclick="closeModalBtn()"
+        style="padding:11px;background:var(--light);color:var(--navy);border:none;
+               border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">
+        Закрыть
+      </button>
+    </div>
+  `;
+}
+
+function renderDomainTabs(){
+  const el = document.getElementById('domain-tabs');
+  el.innerHTML = CHECKLIST_DOMAINS.map(d=>`
+    <button onclick="selectDomain('${d.key}')" id="tab-${d.key}"
+      style="padding:7px 14px;border-radius:20px;border:none;font-size:13px;font-weight:700;cursor:pointer;
+        background:${d.key===currentDomain?d.color:'#E0E0E0'};
+        color:${d.key===currentDomain?'white':'var(--muted)'}">
+      ${d.label}
+    </button>
+  `).join('');
+}
+
+function selectDomain(key){
+  currentDomain = key;
+  renderDomainTabs();
+  renderChecklist();
+}
+
+function renderChecklist(){
+  const dom = CHECKLIST_DOMAINS.find(d=>d.key===currentDomain);
+  if(!dom) return;
+  document.getElementById('check-domain-label').textContent = `Чек-лист: ${dom.label}`;
+  const el = document.getElementById('checklist-body');
+  el.innerHTML = dom.items.map((item,i)=>{
+    const k = `${currentDomain}_${i}`;
+    const checked = checkState[k];
+    return `
+      <div class="checklist-item ${checked?'checked':''}" onclick="toggleCheck('${k}')">
+        <div class="check-box">${checked?'✓':''}</div>
+        <div>
+          <div class="check-text">${item.text}</div>
+          <div class="check-code" data-tip="Код заявки: ${item.v2}">${item.v2}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleCheck(key){
+  checkState[key] = !checkState[key];
+  renderChecklist();
+}
+
+function resetChecklist(){
+  CHECKLIST_DOMAINS.forEach(d=>{
+    d.items.forEach((_,i)=>{ checkState[`${d.key}_${i}`]=false; });
+  });
+  renderChecklist();
+}
+
+function renderGloss(filter=''){
+  const el = document.getElementById('gloss-list');
+  const filtered = GLOSSARY.filter(g=>
+    !filter ||
+    g.a.toLowerCase().includes(filter.toLowerCase())||
+    g.ru.toLowerCase().includes(filter.toLowerCase())||
+    g.kz.toLowerCase().includes(filter.toLowerCase())||
+    g.d.toLowerCase().includes(filter.toLowerCase())
+  );
+  if(!filtered.length){ el.innerHTML='<div class="no-results">Термин не найден</div>'; return; }
+  el.innerHTML = filtered.map(g=>`
+    <div class="gloss-item">
+      <div class="gloss-abbr">${g.a}</div>
+      <div class="gloss-ru">${g.ru}</div>
+      <div class="gloss-kz">${g.kz}</div>
+      <div class="gloss-def">${g.d}</div>
+    </div>
+  `).join('');
+}
+
+function renderSeasons(){
+  const el = document.getElementById('season-list');
+  el.innerHTML = SEASONS.map(s=>`
+    <div class="season-card">
+      <div class="season-header" style="background:${s.color}">
+        <div class="season-name">${s.name}</div>
+        <div class="season-months">${s.months}</div>
+      </div>
+      <div class="season-body">
+        ${s.items.map(i=>`<div class="season-item">${i}</div>`).join('')}
+        ${s.risks.map(r=>`<div class="season-risk">${r}</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const navBtn = document.getElementById('nav-'+name);
+  if(navBtn) navBtn.classList.add('active');
+  if(name==='history') renderHistory();
+  if(name==='mkd') renderMKDList();
+  if(name==='norms') showNormTab('laws');
+}
+
+function filterEmrg(v){
+  document.getElementById('clear-emrg').style.display = v?'block':'none';
+  renderSops(v);
+}
+function filterSymptoms(v){
+  document.getElementById('clear-sym').style.display = v?'block':'none';
+  const filtered = SYMPTOMS.filter(s=>
+    !v || s.name.toLowerCase().includes(v.toLowerCase())||
+    s.action.toLowerCase().includes(v.toLowerCase())
+  );
+  const el = document.getElementById('symptom-list');
+  if(!filtered.length){ el.innerHTML='<div class="no-results">Симптом не найден</div>'; return; }
+  el.innerHTML = filtered.map((s)=>{
+    const i = SYMPTOMS.indexOf(s);
+    return `
+      <div class="symptom-item" onclick="showSymptomModal(${i})">
+        <div class="symptom-domain" style="background:var(--${s.domain});border-radius:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${s.icon}</div>
+        <div class="symptom-text">
+          <div class="symptom-name">${s.name}</div>
+          <div class="symptom-action">${s.action}</div>
+        </div>
+        <div class="symptom-arrow" style="color:#CCC;font-size:16px">›</div>
+      </div>
+    `;
+  }).join('');
+}
+function filterGloss(v){
+  document.getElementById('clear-gloss').style.display = v?'block':'none';
+  renderGloss(v);
+}
+function clearSearch(which){
+  const inputMap={emrg:'search-emrg',sym:'search-sym',gloss:'search-gloss'};
+  document.getElementById(inputMap[which]).value='';
+  document.getElementById('clear-'+which).style.display='none';
+  if(which==='emrg') renderSops('');
+  if(which==='sym') renderSymptoms('');
+  if(which==='gloss') renderGloss('');
+}
+
+function closeModal(e){
+  if(e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+function closeModalBtn(){
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// SERVICE WORKER REGISTRATION
+// ═══════════════════════════════════════════════════════
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+}
+
+// ═══════════════════════════════════════════════════════
+// CALL HANDLER — works on mobile, shows toast on desktop
+// ═══════════════════════════════════════════════════════
+function handleCall(event, num){
+  event.preventDefault();
+  event.stopPropagation();
+  var clean = num.replace(/\D/g,'');
+  // Try Android intent to force phone dialer (bypasses app chooser)
+  var ua = navigator.userAgent || '';
+  if(/Android/i.test(ua)){
+    // intent:// forces phone app on Android, skips chooser
+    window.location.href = 'intent:'+clean+'#Intent;scheme=tel;action=android.intent.action.DIAL;end';
+  } else {
+    window.location.href = 'tel:'+clean;
+  }
+  showCallToast('📞 Набираем: ' + num);
+}
+
+function showCallToast(num){
+  // Remove existing toast
+  const existing = document.getElementById('call-toast');
+  if(existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'call-toast';
+  toast.innerHTML = `📞 Набираем: <strong>${num}</strong>`;
+  toast.style.cssText = `
+    position:fixed; bottom:88px; left:50%; transform:translateX(-50%);
+    background:#1A1A2E; color:white; padding:12px 20px;
+    border-radius:10px; font-size:15px; font-weight:600;
+    box-shadow:0 4px 20px rgba(0,0,0,0.35);
+    z-index:500; white-space:nowrap;
+    animation: toastIn 0.2s ease;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(()=>{ if(toast.parentNode) toast.remove(); }, 2500);
+}
+
+// Add toast animation
+const toastStyle = document.createElement('style');
+toastStyle.textContent = '@keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(8px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }';
+document.head.appendChild(toastStyle);
+
+// ═══════════════════════════════════════════════════════
+// HOUSEMASTER PROFILE
+// ═══════════════════════════════════════════════════════
+function saveOnboarding(){
+  const name     = document.getElementById('ob-name').value.trim();
+  const phone    = document.getElementById('ob-phone').value.trim();
+  const address  = document.getElementById('ob-address').value.trim();
+  const contract = document.getElementById('ob-contract').value.trim();
+
+  if(!name || !phone){
+    if(!name) document.getElementById('ob-name').style.borderColor='var(--red)';
+    if(!phone) document.getElementById('ob-phone').style.borderColor='var(--red)';
+    showCallToast('⚠ Введите имя и телефон');
+    return;
+  }
+  localStorage.setItem('hm_name', name);
+  localStorage.setItem('hm_phone', phone);
+  if(address)  localStorage.setItem('hm_address', address);
+  if(contract) localStorage.setItem('hm_contract', contract);
+
+  document.getElementById('onboarding').classList.remove('visible');
+  initHMProfile();
+  showCallToast('✅ Профиль сохранён. Добро пожаловать!');
+}
+
+function initHMProfile(){
+  const name     = localStorage.getItem('hm_name');
+  const phone    = localStorage.getItem('hm_phone');
+  const address  = localStorage.getItem('hm_address') || '';
+  const contract = localStorage.getItem('hm_contract') || '';
+
+  if(!name || !phone) return;
+
+  // Show avatar in topbar
+  const avatar = document.getElementById('hm-avatar');
+  if(avatar){
+    avatar.style.display = 'block';
+    const short = name.split(' ');
+    document.getElementById('hm-name-short').textContent =
+      short.length >= 2 ? short[0]+' '+short[1][0]+'.' : name.slice(0,12);
+  }
+
+  // Show HM card on emergency page
+  const card = document.getElementById('hm-card-section');
+  if(card){
+    card.style.display = 'block';
+    document.getElementById('hm-card-name').textContent = name;
+    document.getElementById('hm-card-address').textContent = address || 'МКД не указан';
+    document.getElementById('hm-card-contract').textContent = contract ? 'Контракт: '+contract : '';
+
+    const cleanPhone = phone.replace(/\D/g,'');
+    const msg = encodeURIComponent('Хаузмастер '+name+' на связи. Контракт: '+(contract||'б/н'));
+
+    const callBtn = document.getElementById('hm-call-btn');
+    callBtn.onclick = (e) => handleCall(e, phone);
+
+    document.getElementById('hm-wa-btn').href = 'https://wa.me/'+cleanPhone+'?text='+msg;
+    document.getElementById('hm-tg-btn').href = 'https://t.me/+'+cleanPhone;
+  }
+
+  // Update topbar subtitle with MKD address
+  const sub = document.getElementById('topbar-sub');
+  if(sub && address) sub.textContent = address;
+}
+
+function showHMProfile(){
+  const name     = localStorage.getItem('hm_name')||'';
+  const phone    = localStorage.getItem('hm_phone')||'';
+  const address  = localStorage.getItem('hm_address')||'';
+  const contract = localStorage.getItem('hm_contract')||'';
+
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div style="font-size:36px;margin-bottom:8px">🧰</div>
+      <div class="modal-title">${name}</div>
+      <div class="modal-sub">${phone}</div>
+    </div>
+    <div class="modal-section">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--light);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:3px">МКД</div>
+          <div style="font-size:13px;font-weight:600">${address||'Не указан'}</div>
+        </div>
+        <div style="background:var(--light);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:3px">КОНТРАКТ</div>
+          <div style="font-size:13px;font-weight:600">${contract||'Не указан'}</div>
+        </div>
+      </div>
+      <div style="background:var(--l1);border-radius:10px;padding:12px;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:3px">СТАТУС</div>
+        <div style="font-size:13px">✅ Хаузмастер зарегистрирован</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Система ОСИ РК · Семей (пилот)</div>
+      </div>
+    </div>
+    <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:8px">
+      <button onclick="editHMProfile()"
+        style="padding:12px;background:var(--light);color:var(--navy);border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">
+        ✏️ Редактировать профиль
+      </button>
+      <button onclick="closeModalBtn()"
+        style="padding:12px;background:var(--mid);color:var(--muted);border:none;border-radius:10px;font-size:14px;cursor:pointer">
+        Закрыть
+      </button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function editHMProfile(){
+  // Pre-fill onboarding form and show it again
+  document.getElementById('ob-name').value    = localStorage.getItem('hm_name')||'';
+  document.getElementById('ob-phone').value   = localStorage.getItem('hm_phone')||'';
+  document.getElementById('ob-address').value = localStorage.getItem('hm_address')||'';
+  document.getElementById('ob-contract').value= localStorage.getItem('hm_contract')||'';
+  closeModalBtn();
+  document.getElementById('onboarding').classList.add('visible');
+}
+
+function checkOnboarding(){
+  if(!localStorage.getItem('hm_name') || !localStorage.getItem('hm_phone')){
+    document.getElementById('onboarding').classList.add('visible');
+  } else {
+    initHMProfile();
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════
+// МКД MODULE
+// ═══════════════════════════════════════════════════════
+function getMKDList(){
+  try{ return JSON.parse(localStorage.getItem('hm_mkd_list')||'[]'); }
+  catch(e){ return []; }
+}
+function saveMKDList(list){
+  localStorage.setItem('hm_mkd_list', JSON.stringify(list));
+}
+function getActiveMKD(){
+  const id = localStorage.getItem('hm_active_mkd');
+  if(!id) return null;
+  return getMKDList().find(m=>m.id===id)||null;
+}
+
+function renderMKDList(){
+  const list = getMKDList();
+  const activeId = localStorage.getItem('hm_active_mkd');
+  const el = document.getElementById('mkd-list');
+  const activeCard = document.getElementById('mkd-active-card');
+
+  const active = list.find(m=>m.id===activeId);
+  if(active){
+    activeCard.style.display='block';
+    document.getElementById('mkd-active-name').textContent = active.address;
+    document.getElementById('mkd-active-meta').textContent =
+      'Контракт: '+active.contract + (active.osi_name?' · ОСИ: '+active.osi_name:'');
+  } else {
+    activeCard.style.display='none';
+  }
+
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);font-size:14px">МКД не добавлены.<br>Нажми «+ Добавить МКД»</div>';
+    return;
+  }
+  el.innerHTML = list.map(m=>`
+    <div style="background:white;border-radius:12px;margin-bottom:8px;
+      overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);
+      border:2px solid ${m.id===activeId?'var(--gold)':'transparent'}">
+      <div style="padding:14px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;background:${m.id===activeId?'var(--gold)':'var(--light)'};
+          border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">
+          🏢
+        </div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700;color:var(--navy)">${m.address}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Контракт: ${m.contract||'—'}</div>
+          ${m.osi_name?`<div style="font-size:12px;color:var(--muted)">Председатель: ${m.osi_name}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          ${m.id!==activeId?`<button onclick="setActiveMKD('${m.id}')"
+            style="padding:6px 10px;background:var(--navy);color:white;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
+            Выбрать
+          </button>`:`<span style="font-size:11px;font-weight:700;color:var(--gold);padding:6px">✓ Активен</span>`}
+          <button onclick="deleteMKD('${m.id}')"
+            style="padding:6px 10px;background:var(--l3);color:var(--red);border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
+            Удалить
+          </button>
+        </div>
+      </div>
+      ${m.osi_phone?`<div style="display:flex;border-top:1px solid #F0F0F0">
+        <a href="javascript:void(0)" onclick="handleCall(event,'${m.osi_phone}')"
+          style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;
+                 text-decoration:none;font-size:13px;font-weight:700;color:var(--navy)">
+          📞 Председатель
+        </a>
+        <a href="https://wa.me/${m.osi_phone.replace(/\D/g,'')}" target="_blank"
+          style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;
+                 border-left:1px solid #F0F0F0;text-decoration:none;font-size:13px;font-weight:700;color:var(--green)">
+          💬 WhatsApp
+        </a>
+      </div>`:''}
+    </div>
+  `).join('');
+}
+
+function setActiveMKD(id){
+  localStorage.setItem('hm_active_mkd', id);
+  renderMKDList();
+  // Update topbar subtitle
+  const mkd = getMKDList().find(m=>m.id===id);
+  const sub = document.getElementById('topbar-sub');
+  if(mkd && sub) sub.textContent = mkd.address;
+  showCallToast('🏢 Активный МКД: '+mkd.address);
+}
+
+function deleteMKD(id){
+  if(!confirm('Удалить этот МКД?')) return;
+  const list = getMKDList().filter(m=>m.id!==id);
+  saveMKDList(list);
+  if(localStorage.getItem('hm_active_mkd')===id) localStorage.removeItem('hm_active_mkd');
+  renderMKDList();
+}
+
+function showAddMKD(){
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div style="font-size:28px;margin-bottom:6px">🏢</div>
+      <div class="modal-title">Добавить МКД</div>
+      <div class="modal-sub">Заполняет председатель ОСИ</div>
+    </div>
+    <div class="modal-section">
+      ${['add-address:Адрес МКД:ул. Ленина, 42, Семей:text',
+         'add-contract:ID контракта:КЗ-2024-СМЙ-042:text',
+         'add-osi-name:ФИО председателя ОСИ:Петров Пётр Петрович:text',
+         'add-osi-phone:Телефон председателя:+7 (___) ___-__-__:tel']
+        .map(f=>{const[id,label,ph,type]=f.split(':');return `
+        <div style="margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px">${label}</div>
+          <input id="${id}" type="${type}" placeholder="${ph}"
+            style="width:100%;padding:11px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:15px;outline:none;font-family:inherit"
+            onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='#E0E0E0'">
+        </div>`;}).join('')}
+    </div>
+    <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:8px">
+      <button onclick="saveMKD()"
+        style="padding:14px;background:var(--navy);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">
+        Добавить МКД
+      </button>
+      <button onclick="closeModalBtn()"
+        style="padding:12px;background:var(--light);color:var(--navy);border:none;border-radius:10px;font-size:14px;cursor:pointer">
+        Отмена
+      </button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function saveMKD(){
+  const address = document.getElementById('add-address').value.trim();
+  const contract = document.getElementById('add-contract').value.trim();
+  const osiName  = document.getElementById('add-osi-name').value.trim();
+  const osiPhone = document.getElementById('add-osi-phone').value.trim();
+  if(!address){ document.getElementById('add-address').style.borderColor='var(--red)'; showCallToast('⚠ Укажите адрес МКД'); return; }
+  const list = getMKDList();
+  const newMkd = { id: Date.now().toString(), address, contract, osi_name:osiName, osi_phone:osiPhone };
+  list.push(newMkd);
+  saveMKDList(list);
+  if(!localStorage.getItem('hm_active_mkd')) localStorage.setItem('hm_active_mkd', newMkd.id);
+  closeModalBtn();
+  renderMKDList();
+  showCallToast('✅ МКД добавлен: '+address);
+}
+
+// ═══════════════════════════════════════════════════════
+// HISTORY MODULE
+// ═══════════════════════════════════════════════════════
+let historyFilter = 'all';
+
+function getRequests(){
+  try{ return JSON.parse(localStorage.getItem('hm_requests')||'[]'); }
+  catch(e){ return []; }
+}
+function saveRequest(name, card, sev, mkdAddr, contract){
+  const reqs = getRequests();
+  reqs.unshift({
+    id: Date.now().toString(),
+    date: new Date().toISOString(),
+    mkd: mkdAddr,
+    contract,
+    code: card,
+    name,
+    sev,
+    status: 'open',
+    photos: [],
+  });
+  localStorage.setItem('hm_requests', JSON.stringify(reqs.slice(0,200)));
+}
+
+function filterHistory(f){
+  historyFilter = f;
+  ['all','open','closed'].forEach(id=>{
+    const btn = document.getElementById('hf-'+id);
+    btn.style.background = id===f ? 'var(--navy)' : '#E0E0E0';
+    btn.style.color = id===f ? 'white' : 'var(--muted)';
+  });
+  renderHistory();
+}
+
+function renderHistory(){
+  let reqs = getRequests();
+  if(historyFilter==='open')   reqs = reqs.filter(r=>r.status==='open');
+  if(historyFilter==='closed') reqs = reqs.filter(r=>r.status==='closed');
+
+  const el = document.getElementById('history-list');
+  if(!reqs.length){
+    el.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted);font-size:14px">Заявок пока нет.<br>Нажми «Сохранить» в карточке симптома.</div>';
+    return;
+  }
+
+  // Group by date
+  const groups = {};
+  reqs.forEach(r=>{
+    const d = new Date(r.date);
+    const key = d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+    if(!groups[key]) groups[key]=[];
+    groups[key].push(r);
+  });
+
+  el.innerHTML = Object.entries(groups).map(([date,items])=>`
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.5px;
+        text-transform:uppercase;margin-bottom:8px;padding:0 2px">${date}</div>
+      ${items.map(r=>`
+        <div style="background:white;border-radius:12px;margin-bottom:8px;
+          box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden">
+          <div style="padding:12px 14px;display:flex;align-items:flex-start;gap:10px">
+            <div style="width:36px;height:36px;border-radius:8px;flex-shrink:0;
+              background:${r.sev==='L3'?'var(--l3)':r.sev==='L2'?'var(--l2)':'var(--l1)'};
+              display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;
+              color:${r.sev==='L3'?'var(--red)':r.sev==='L2'?'#8B6914':'var(--green)'}">${r.sev}</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700;color:var(--navy);line-height:1.3">${r.name}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">${r.code} · ${r.mkd}</div>
+              <div style="font-size:11px;color:var(--muted)">${new Date(r.date).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</div>
+            </div>
+            <div>
+              <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;
+                background:${r.status==='open'?'var(--l2)':'var(--l1)'};
+                color:${r.status==='open'?'#8B6914':'var(--green)'}">
+                ${r.status==='open'?'Открыта':'Закрыта'}
+              </span>
+            </div>
+          </div>
+          <div style="display:flex;border-top:1px solid #F8F8F8">
+            <button onclick="toggleRequestStatus('${r.id}')"
+              style="flex:1;padding:9px;background:none;border:none;font-size:12px;font-weight:700;
+                     color:${r.status==='open'?'var(--green)':'#8B6914'};cursor:pointer">
+              ${r.status==='open'?'✓ Закрыть':'↺ Открыть снова'}
+            </button>
+            <button onclick="deleteRequest('${r.id}')"
+              style="padding:9px 14px;background:none;border:none;border-left:1px solid #F0F0F0;
+                     font-size:12px;font-weight:700;color:var(--red);cursor:pointer">
+              Удалить
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function toggleRequestStatus(id){
+  const reqs = getRequests();
+  const r = reqs.find(x=>x.id===id);
+  if(r) r.status = r.status==='open'?'closed':'open';
+  localStorage.setItem('hm_requests', JSON.stringify(reqs));
+  renderHistory();
+}
+function deleteRequest(id){
+  if(!confirm('Удалить заявку?')) return;
+  const reqs = getRequests().filter(x=>x.id!==id);
+  localStorage.setItem('hm_requests', JSON.stringify(reqs));
+  renderHistory();
+}
+
+// ═══════════════════════════════════════════════════════
+// NORMATIVKA MODULE
+// ═══════════════════════════════════════════════════════
+const NORMS = [
+  {
+    id:'osi-law', title:'Закон об ОСИ',
+    short:'Объединение собственников имущества — основной закон управления МКД в РК',
+    url:'https://adilet.zan.kz/rus/docs/Z2200000142',
+    articles:[
+      {n:'Ст. 10','t':'Права ОСИ','d':'ОСИ вправе заключать договоры на техническое обслуживание, нанимать хаузмастера, устанавливать взносы на содержание общего имущества.'},
+      {n:'Ст. 11','t':'Обязанности ОСИ','d':'ОСИ обязано обеспечивать надлежащее содержание общего имущества МКД, организовывать плановые осмотры не реже 2 раз в год.'},
+      {n:'Ст. 16','t':'Хаузмастер','d':'Физическое лицо, осуществляющее функции по техническому обслуживанию МКД на основании трудового договора с ОСИ. Должен иметь соответствующую квалификацию.'},
+      {n:'Ст. 22','t':'Общее имущество','d':'Кровля, подвал, инженерные сети, лифты, подъезды — общее имущество МКД. Ответственность за ТО несёт ОСИ.'},
+      {n:'Ст. 31','t':'Взносы на ТО','d':'Размер взноса на содержание и ремонт устанавливается общим собранием. Минимальный размер определяется местными исполнительными органами.'},
+    ]
+  },
+  {
+    id:'housing-code', title:'Жилищный кодекс РК',
+    short:'Основные нормы жилищных отношений, права собственников',
+    url:'https://adilet.zan.kz/rus/docs/K970000094_',
+    articles:[
+      {n:'Ст. 31','t':'Права собственника','d':'Собственник квартиры несёт ответственность за содержание имущества внутри квартиры. Общее имущество обслуживается за счёт всех собственников соразмерно доле.'},
+      {n:'Ст. 36','t':'Разграничение ответственности','d':'Граница ответственности ОСИ и собственника — первый запорный кран (вентиль) на вводе в квартиру. До крана — ОСИ, после — собственник.'},
+      {n:'Ст. 42','t':'Техническое обслуживание','d':'Плановые осмотры МКД проводятся не реже 2 раз в год. Весенний осмотр — апрель-май. Осенний — сентябрь-октябрь. По результатам составляется акт.'},
+    ]
+  },
+  {
+    id:'sanpin', title:'СанПиН РК — Жилые здания',
+    short:'Санитарные нормы: температура, давление воды, качество ГВС',
+    url:'https://adilet.zan.kz/rus/docs/V1800017157',
+    articles:[
+      {n:'п. 6.1','t':'Температура в квартире','d':'Минимальная температура воздуха в жилых помещениях: +18°C (норма), +20°C (угловые комнаты). При t < +15°C и невозможности устранения — жильцы имеют право на перерасчёт.'},
+      {n:'п. 7.3','t':'Температура ГВС','d':'Температура горячей воды у водоразборного прибора — не ниже +50°C (норма потребителя), не ниже +60°C (на стояке). При t < 60°C риск развития бактерии Legionella.'},
+      {n:'п. 7.5','t':'Давление ХВС','d':'Давление холодной воды на верхнем этаже — не менее 0,3 МПа (3 бар). На нижних этажах — не более 0,6 МПа (6 бар) без редуктора.'},
+      {n:'п. 9.2','t':'Вентиляция подвала','d':'Продухи в цоколе МКД должны обеспечивать кратность воздухообмена не менее 1 в час. Суммарная площадь продухов — не менее 1/400 площади подвала.'},
+    ]
+  },
+  {
+    id:'fire-law', title:'Закон о пожарной безопасности',
+    short:'Требования к противопожарным мерам в МКД',
+    url:'https://adilet.zan.kz/rus/docs/Z010000090_',
+    articles:[
+      {n:'Ст. 14','t':'Обязанности организаций','d':'ОСИ обязано обеспечить исправное состояние аварийного освещения, средств пожаротушения, эвакуационных выходов и систем оповещения.'},
+      {n:'Ст. 21','t':'Пути эвакуации','d':'Лестничные клетки и коридоры МКД должны быть свободны. Хранение вещей в МОП запрещено. Противопожарные двери — в рабочем состоянии.'},
+      {n:'Ст. 28','t':'Аварийное освещение','d':'Аварийное освещение путей эвакуации — обязательно. Проверка работоспособности — не реже 1 раза в месяц. Неработающий светильник — L2, замена в 3 р.д.'},
+    ]
+  },
+];
+
+const ACT_TEMPLATES = [
+  {
+    id:'act-inspection', title:'Акт планового осмотра',
+    fields:['Дата и время осмотра','Адрес МКД','Подъезд / этаж / зона','Хаузмастер (ФИО)','Код заявки V2','Severity (L1/L2/L3)','IDI (1/2/3/4)','Время осмотра (мин)','ECL (1/2/3/4)','Описание выявленного','Ограничения осмотра','Количество фото','Рекомендация','Требуется подрядчик (да/нет)','CAPEX-триггер (да/нет)','Подпись хаузмастера','Подпись жителя / представителя ОСИ'],
+  },
+  {
+    id:'act-damage', title:'Акт ущерба при затоплении',
+    fields:['Дата и время','Адрес МКД','Квартира пострадавшего','Собственник квартиры (ФИО)','Источник затопления','Перечень повреждённого имущества','Площадь намокания (кв.м)','Виновная сторона (ОСИ / собственник / третье лицо)','Принятые меры','Хаузмастер (ФИО и подпись)','Собственник (ФИО и подпись)','Дата составления акта'],
+  },
+  {
+    id:'act-emergency', title:'Акт аварийного события',
+    fields:['Дата и время начала аварии','Дата и время ликвидации','Адрес МКД','Тип аварии (SOP-код)','Описание ситуации','Службы вызваны (номера и время)','Службы прибыли (время)','Эвакуировано жильцов (кол-во)','Пострадавшие (ФИО, характер)','Ущерб (краткое описание)','Принятые меры','Хаузмастер (ФИО и подпись)','Председатель ОСИ (ФИО и подпись)'],
+  },
+  {
+    id:'act-transfer', title:'Акт передачи МКД',
+    fields:['Дата передачи','Адрес МКД','Контракт ID','Передающая сторона (ФИО)','Принимающий хаузмастер (ФИО)','Председатель ОСИ (ФИО)','Состояние кровли','Состояние подвала','Состояние ИТП','Состояние ВРУ','Состояние водомерного узла','Ключи и доступы (список)','Документация (список)','Подписи трёх сторон'],
+  },
+];
+
+let currentNormTab = 'laws';
+
+function showNormTab(tab){
+  currentNormTab = tab;
+  ['laws','acts'].forEach(t=>{
+    const btn = document.getElementById('nt-'+t);
+    btn.style.background = t===tab ? 'var(--navy)' : '#E0E0E0';
+    btn.style.color = t===tab ? 'white' : 'var(--muted)';
+  });
+
+  const el = document.getElementById('norms-content');
+  if(tab==='laws'){
+    el.innerHTML = NORMS.map(n=>`
+      <div style="background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+        <div style="padding:14px 16px;background:var(--navy)">
+          <div style="font-size:16px;font-weight:800;color:white">${n.title}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px">${n.short}</div>
+          <a href="${n.url}" target="_blank"
+            style="display:inline-block;margin-top:8px;background:rgba(255,255,255,0.12);
+                   color:var(--gold);text-decoration:none;font-size:11px;font-weight:700;
+                   padding:4px 10px;border-radius:6px">
+            ↗ adilet.zan.kz
+          </a>
+        </div>
+        ${n.articles.map(a=>`
+          <div style="padding:12px 16px;border-bottom:1px solid #F5F5F5">
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+              <span style="font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0">${a.n}</span>
+              <span style="font-size:13px;font-weight:700;color:var(--navy)">${a.t}</span>
+            </div>
+            <div style="font-size:13px;color:var(--text);line-height:1.5">${a.d}</div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  } else {
+    el.innerHTML = ACT_TEMPLATES.map(t=>`
+      <div style="background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+        <div style="padding:14px 16px;background:var(--steel);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:15px;font-weight:800;color:white">${t.title}</div>
+          <button onclick="downloadActTemplate('${t.id}')"
+            style="background:white;color:var(--navy);border:none;border-radius:7px;
+                   padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">
+            ⬇ Скачать
+          </button>
+        </div>
+        <div style="padding:12px 16px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px">Поля акта</div>
+          ${t.fields.map((f,i)=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F8F8F8;font-size:13px">
+              <span style="font-size:10px;font-weight:700;color:var(--muted);min-width:20px">${i+1}</span>
+              <span>${f}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function downloadActTemplate(id){
+  const t = ACT_TEMPLATES.find(x=>x.id===id);
+  if(!t) return;
+  const activeMkd = getActiveMKD();
+  const mkd = activeMkd ? activeMkd.address : (localStorage.getItem('hm_address')||'');
+  const contract = activeMkd ? activeMkd.contract : (localStorage.getItem('hm_contract')||'');
+  const hmName = localStorage.getItem('hm_name')||'';
+  const now = new Date().toLocaleDateString('ru-RU');
+
+  const text = `${t.title.toUpperCase()}
+${'═'.repeat(50)}
+Система ОСИ Республики Казахстан
+Хаузмастер: ${hmName}
+МКД: ${mkd}
+Контракт: ${contract}
+${'═'.repeat(50)}
+
+${t.fields.map((f,i)=>`${i+1}. ${f}:
+   _______________________________________________
+`).join('
+')}
+${'═'.repeat(50)}
+Дата формирования шаблона: ${now}
+Система ОСИ РК | housemaster-pwa`;
+
+  const blob = new Blob([text],{type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`${id}_${now.replace(/\./g,'-')}.txt`;
+  a.click(); URL.revokeObjectURL(url);
+  showCallToast('📝 Шаблон скачан: '+t.title);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT — script at bottom of <body>, DOM already ready.
+// Functions are global — callable from onclick attributes.
+// ═══════════════════════════════════════════════════════
+renderContacts();
+renderSops();
+renderSymptoms();
+renderDomainTabs();
+renderChecklist();
+renderGloss();
+renderSeasons();
+checkOnboarding();
+
+// Init active MKD in topbar
+(function(){
+  var active = getActiveMKD();
+  if(active){
+    var sub = document.getElementById('topbar-sub');
+    if(sub) sub.textContent = active.address;
+  }
+})();
+</script>
+</body>
+</html>
