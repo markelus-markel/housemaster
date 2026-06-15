@@ -547,13 +547,20 @@
 
 <!-- SYMPTOMS PAGE -->
 <div class="page" id="page-symptoms">
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input class="search-input" id="search-sym" placeholder="Описать симптом..." oninput="filterSymptoms(this.value)">
-    <span class="search-clear" id="clear-sym" onclick="clearSearch('sym')">×</span>
+  <div class="search-wrap" style="background:white;padding:10px 16px">
+    <span class="search-icon" style="color:var(--muted)">🔍</span>
+    <input class="search-input" id="search-sym" placeholder="Описать симптом..."
+      oninput="filterSymptoms(this.value)"
+      style="background:var(--light);color:var(--text);border:1.5px solid #E0E0E0;border-radius:10px;padding:9px 36px 9px 36px">
+    <span class="search-clear" id="clear-sym" onclick="clearSearch('sym')"
+      style="color:var(--muted)">×</span>
+    <button onclick="startVoiceInput()" id="voice-btn" data-tip="Голосовой ввод"
+      style="position:absolute;right:26px;top:50%;transform:translateY(-50%);
+             background:none;border:none;font-size:20px;cursor:pointer;
+             transition:transform 0.15s" title="Голосовой ввод">🎙️</button>
   </div>
   <div class="section">
-    <div class="section-label">Симптом → карточка осмотра</div>
+    <div class="section-label">Обследование → карточка осмотра</div>
   </div>
   <div class="card" id="symptom-list"></div>
 </div>
@@ -652,6 +659,26 @@
   <div style="padding:8px 16px" id="history-list"></div>
 </div>
 
+<!-- DOCUMENTATION PAGE -->
+<div class="page" id="page-docs">
+  <div style="background:var(--navy);padding:48px 16px 14px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <button onclick="showPage('emrg')" style="background:rgba(255,255,255,0.12);border:none;border-radius:7px;padding:5px 10px;color:white;font-size:12px;font-weight:700;cursor:pointer">← Главная</button>
+    </div>
+    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:2px">Документация</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5)">Реестр · Отчёты · Акты · Планы</div>
+  </div>
+  <div style="padding:10px 16px 4px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px" id="docs-tabs">
+    <button onclick="showDocsTab('registry')" id="dt-registry" style="padding:7px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;white-space:nowrap;background:var(--navy);color:white;cursor:pointer;flex-shrink:0">📊 Реестр</button>
+    <button onclick="showDocsTab('metrics')"  id="dt-metrics"  style="padding:7px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;white-space:nowrap;background:#E0E0E0;color:var(--muted);cursor:pointer;flex-shrink:0">📋 Метрика</button>
+    <button onclick="showDocsTab('measures')" id="dt-measures" style="padding:7px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;white-space:nowrap;background:#E0E0E0;color:var(--muted);cursor:pointer;flex-shrink:0">🔧 Меры</button>
+    <button onclick="showDocsTab('report')"   id="dt-report"   style="padding:7px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;white-space:nowrap;background:#E0E0E0;color:var(--muted);cursor:pointer;flex-shrink:0">📨 Отчёт</button>
+    <button onclick="showDocsTab('act')"      id="dt-act"      style="padding:7px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;white-space:nowrap;background:#E0E0E0;color:var(--muted);cursor:pointer;flex-shrink:0">📝 Акт</button>
+    <button onclick="showDocsTab('plan')"     id="dt-plan"     style="padding:7px 14px;border-radius:20px;border:none;font-size:12px;font-weight:700;white-space:nowrap;background:#E0E0E0;color:var(--muted);cursor:pointer;flex-shrink:0">📅 План</button>
+  </div>
+  <div style="padding:8px 16px 80px" id="docs-content"></div>
+</div>
+
 <!-- NORMATIVKA PAGE -->
 <div class="page" id="page-norms">
   <div style="background:var(--navy);padding:48px 16px 16px">
@@ -671,8 +698,8 @@
     <button class="nav-btn emrg-btn active" id="nav-emrg" onclick="showPage('emrg')" data-tip="Аварийные контакты и SOP">
       <span class="icon">🚨</span>Аварии
     </button>
-    <button class="nav-btn" id="nav-symptoms" onclick="showPage('symptoms')" data-tip="Симптом → карточка осмотра">
-      <span class="icon">🔍</span>Симптомы
+    <button class="nav-btn" id="nav-symptoms" onclick="showPage('symptoms')" data-tip="Обследование объекта">
+      <span class="icon">🔍</span>Обследование
     </button>
     <button class="nav-btn" id="nav-checks" onclick="showPage('checks')" data-tip="Плановый осмотр по доменам">
       <span class="icon">☑</span>Чек-лист
@@ -691,8 +718,8 @@
     <button class="nav-btn" id="nav-norms" onclick="showPage('norms')" data-tip="Нормативная база РК">
       <span class="icon">⚖️</span>Законы
     </button>
-    <button class="nav-btn" id="nav-nav" onclick="showNavSelector()" data-tip="Все разделы">
-      <span class="icon">☰</span>Навигация
+    <button class="nav-btn" id="nav-docs" onclick="showPage('docs')" data-tip="Документация">
+      <span class="icon">📁</span>Документы
     </button>
   </div>
 </nav>
@@ -710,7 +737,7 @@
       </button>
       <button onclick="navTo('symptoms')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
         <span style="font-size:24px">🔍</span>
-        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Симптомы</div><div style="font-size:11px;color:var(--muted)">Что случилось?</div></div>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Обследование</div><div style="font-size:11px;color:var(--muted)">Что случилось?</div></div>
       </button>
       <button onclick="navTo('checks')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
         <span style="font-size:24px">☑</span>
@@ -731,6 +758,10 @@
       <button onclick="navTo('norms')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
         <span style="font-size:24px">⚖️</span>
         <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Законы</div><div style="font-size:11px;color:var(--muted)">НПА и шаблоны</div></div>
+      </button>
+      <button onclick="navTo('docs')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">📁</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Документы</div><div style="font-size:11px;color:var(--muted)">Реестр и отчёты</div></div>
       </button>
       <button onclick="closeNavSelector()" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--mid);border:none;border-radius:12px;cursor:pointer;text-align:left">
         <span style="font-size:24px">✕</span>
@@ -1188,7 +1219,7 @@ function renderSymptoms(filter){
   el.innerHTML = list.map(function(sym){
     var realIdx = SYMPTOMS.indexOf(sym);
     var sevCls = 'sev-' + sym.sev.toLowerCase();
-    return '<div class="symptom-item" onclick="showSymptomModal(' + realIdx + ')">'
+    return '<div class="symptom-item" onclick="showInspectionModal(' + realIdx + ')">'
       + '<div class="symptom-domain dom-' + sym.domain + '" style="background:var(--' + sym.domain + ')">' + sym.icon + '</div>'
       + '<div class="symptom-text">'
       +   '<div class="symptom-name">' + sym.name + '</div>'
@@ -1647,9 +1678,10 @@ function showPage(name){
   document.getElementById('page-'+name).classList.add('active');
   const navBtn = document.getElementById('nav-'+name);
   if(navBtn) navBtn.classList.add('active');
-  if(name==='history') renderHistory();
+  if(name==='history'){ renderHistory(); filterHistory(historyFilter); }
   if(name==='mkd') renderMKDList();
   if(name==='norms') showNormTab('laws');
+  if(name==='docs')  showDocsTab('registry');
 }
 
 function filterEmrg(v){
@@ -1671,7 +1703,7 @@ function filterSymptoms(v){
   }
   el.innerHTML = filtered.map(function(sym){
     var realIdx = SYMPTOMS.indexOf(sym);
-    return '<div class="symptom-item" onclick="showSymptomModal(' + realIdx + ')">'
+    return '<div class="symptom-item" onclick="showInspectionModal(' + realIdx + ')">'
       + '<div class="symptom-domain dom-' + sym.domain + '" style="background:var(--' + sym.domain + ')">' + sym.icon + '</div>'
       + '<div class="symptom-text">'
       +   '<div class="symptom-name">' + sym.name + '</div>'
@@ -2045,15 +2077,69 @@ function filterHistory(f){
 }
 
 function renderHistory(){
-  var reqs = getRequests();
-  if(historyFilter==='open')   reqs = reqs.filter(function(r){return r.status==='open';});
-  if(historyFilter==='closed') reqs = reqs.filter(function(r){return r.status==='closed';});
+  var allReqs = getRequests();
+
+  // Update metric counters
+  var cntAll    = allReqs.length;
+  var cntOpen   = allReqs.filter(function(r){return r.status==='open';}).length;
+  var cntClosed = allReqs.filter(function(r){return r.status==='closed';}).length;
+  var cntEl = document.getElementById('hm-cnt-all');
+  if(cntEl) cntEl.textContent = cntAll;
+  cntEl = document.getElementById('hm-cnt-open');
+  if(cntEl) cntEl.textContent = cntOpen;
+  cntEl = document.getElementById('hm-cnt-closed');
+  if(cntEl) cntEl.textContent = cntClosed;
+
+  // Severity breakdown (show only when filter active)
+  var bdEl = document.getElementById('history-breakdown');
+  var reqs = historyFilter==='open'
+    ? allReqs.filter(function(r){return r.status==='open';})
+    : historyFilter==='closed'
+    ? allReqs.filter(function(r){return r.status==='closed';})
+    : allReqs;
+
+  if(bdEl && reqs.length){
+    bdEl.style.display = 'block';
+    var l1 = reqs.filter(function(r){return r.sev==='L1';}).length;
+    var l2 = reqs.filter(function(r){return r.sev==='L2';}).length;
+    var l3 = reqs.filter(function(r){return r.sev==='L3';}).length;
+    var total = reqs.length;
+    var sevBars = document.getElementById('history-sev-bars');
+    if(sevBars){
+      sevBars.innerHTML =
+        '<div style="flex:1;text-align:center">'
+        + '<div style="height:' + Math.max(4,Math.round(l1/total*48)) + 'px;background:var(--green);border-radius:4px;margin-bottom:4px"></div>'
+        + '<div style="font-size:12px;font-weight:700;color:var(--green)">' + l1 + '</div>'
+        + '<div style="font-size:10px;color:var(--muted)">L1</div>'
+        + '</div>'
+        + '<div style="flex:1;text-align:center">'
+        + '<div style="height:' + Math.max(4,Math.round(l2/total*48)) + 'px;background:#C9A227;border-radius:4px;margin-bottom:4px"></div>'
+        + '<div style="font-size:12px;font-weight:700;color:#8B6914">' + l2 + '</div>'
+        + '<div style="font-size:10px;color:var(--muted)">L2</div>'
+        + '</div>'
+        + '<div style="flex:1;text-align:center">'
+        + '<div style="height:' + Math.max(4,Math.round(l3/total*48)) + 'px;background:var(--red);border-radius:4px;margin-bottom:4px"></div>'
+        + '<div style="font-size:12px;font-weight:700;color:var(--red)">' + l3 + '</div>'
+        + '<div style="font-size:10px;color:var(--muted)">L3</div>'
+        + '</div>';
+    }
+  } else if(bdEl){
+    bdEl.style.display = 'none';
+  }
+
+  // Render based on current view
+  if(historyView === 'cal'){
+    renderCalendar(reqs);
+    return;
+  }
 
   var el = document.getElementById('history-list');
+  if(!el) return;
   if(!reqs.length){
     el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:14px">Заявок пока нет.<br>Нажми «Сохранить» в карточке симптома.</div>';
     return;
   }
+
   // Group by date
   var groups = {};
   reqs.forEach(function(r){
@@ -2063,17 +2149,20 @@ function renderHistory(){
     groups[key].push(r);
   });
 
+  var sevBg  = function(sev){ return sev==='L3'?'var(--l3)':sev==='L2'?'var(--l2)':'var(--l1)'; };
+  var sevCol = function(sev){ return sev==='L3'?'var(--red)':sev==='L2'?'#8B6914':'var(--green)'; };
+
   var html = '';
   Object.keys(groups).forEach(function(date){
     var items = groups[date];
-    var sevBg = function(sev){ return sev==='L3'?'var(--l3)':sev==='L2'?'var(--l2)':'var(--l1)'; };
-    var sevCol = function(sev){ return sev==='L3'?'var(--red)':sev==='L2'?'#8B6914':'var(--green)'; };
     html += '<div style="margin-bottom:16px">'
       + '<div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;padding:0 2px">' + date + '</div>';
     items.forEach(function(r){
       var timeStr = new Date(r.date).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-      var isOpen = r.status==='open';
-      html += '<div class="req-card" data-val="' + r.id + '" onclick="showRequestModal(this.dataset.val)"'
+      var isOpen  = r.status==='open';
+      var statusBg  = isOpen ? 'var(--l2)' : 'rgba(123,31,162,0.12)';
+      var statusCol = isOpen ? '#8B6914' : '#9C27B0';
+      html += '<div class="req-card" data-val="' + r.id + '" onclick="showRequestModal(this.dataset.val)">'
         + '<div style="padding:12px 14px;display:flex;align-items:flex-start;gap:10px">'
         +   '<div style="width:36px;height:36px;border-radius:8px;flex-shrink:0;background:' + sevBg(r.sev) + ';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:' + sevCol(r.sev) + '">' + r.sev + '</div>'
         +   '<div style="flex:1">'
@@ -2081,11 +2170,10 @@ function renderHistory(){
         +     '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + r.code + ' · ' + r.mkd + '</div>'
         +     '<div style="font-size:11px;color:var(--muted)">' + timeStr + '</div>'
         +   '</div>'
-        +   '<div><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:' + (isOpen?'var(--l2)':'var(--l1)') + ';color:' + (isOpen?'#8B6914':'var(--green)') + '">' + (isOpen?'Открыта':'Закрыта') + '</span></div>'
+        +   '<div><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:' + statusBg + ';color:' + statusCol + '">' + (isOpen?'Открыта':'Закрыта') + '</span></div>'
         + '</div>'
-        + '<div style="display:flex;border-top:1px solid #F8F8F8">'
-        +   '<button onclick="toggleRequestStatus(\' + r.id + \')" style="flex:1;padding:9px;background:none;border:none;font-size:12px;font-weight:700;color:' + (isOpen?'var(--green)':'#8B6914') + ';cursor:pointer">' + (isOpen?'✓ Закрыть':'↺ Открыть снова') + '</button>'
-        +   '<button onclick="deleteRequest(\' + r.id + \')" style="padding:9px 14px;background:none;border:none;border-left:1px solid #F0F0F0;font-size:12px;font-weight:700;color:var(--red);cursor:pointer">Удалить</button>'
+        + '<div style="padding:4px 14px 10px;text-align:right">'
+        +   '<span style="font-size:11px;color:var(--muted);font-style:italic">Нажми для деталей →</span>'
         + '</div>'
         + '</div>';
     });
@@ -2261,6 +2349,603 @@ function downloadActTemplate(id){
   URL.revokeObjectURL(url);
   showCallToast('📝 Шаблон скачан: ' + tmpl.title);
 }
+// ── HISTORY VIEW TOGGLE ──────────────────────────────────
+function setHistoryView(view){
+  historyView = view;
+  var listBtn = document.getElementById('view-list-btn');
+  var calBtn  = document.getElementById('view-cal-btn');
+  var listEl  = document.getElementById('history-list');
+  var calEl   = document.getElementById('history-calendar');
+  if(listBtn) { listBtn.style.background = view==='list'?'var(--navy)':'#E0E0E0'; listBtn.style.color = view==='list'?'white':'var(--muted)'; }
+  if(calBtn)  { calBtn.style.background  = view==='cal' ?'var(--navy)':'#E0E0E0'; calBtn.style.color  = view==='cal' ?'white':'var(--muted)'; }
+  if(listEl)  listEl.style.display  = view==='list' ? 'block' : 'none';
+  if(calEl)   calEl.style.display   = view==='cal'  ? 'block' : 'none';
+  renderHistory();
+}
+
+// ── CALENDAR RENDERER ─────────────────────────────────────
+function renderCalendar(reqs){
+  var el = document.getElementById('history-calendar');
+  if(!el) return;
+
+  var now   = new Date(calYear, calMonth, 1);
+  var year  = now.getFullYear();
+  var month = now.getMonth();
+  var daysInMonth = new Date(year, month+1, 0).getDate();
+  var firstDay    = new Date(year, month, 1).getDay(); // 0=Sun
+  // Convert to Mon-first
+  firstDay = (firstDay + 6) % 7;
+
+  var monthName = now.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+
+  // Build date→requests map
+  var dayMap = {};
+  reqs.forEach(function(r){
+    var d = new Date(r.date);
+    if(d.getFullYear()===year && d.getMonth()===month){
+      var key = d.getDate();
+      if(!dayMap[key]) dayMap[key] = [];
+      dayMap[key].push(r);
+    }
+  });
+
+  var weekDays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+
+  var html = '<div style="background:white;border-radius:12px;padding:14px;box-shadow:var(--shadow)">'
+    // Nav row
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+    +   '<button onclick="calPrev()" style="background:var(--light);border:none;border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer">‹</button>'
+    +   '<div style="font-size:14px;font-weight:800;color:var(--navy);text-transform:capitalize">' + monthName + '</div>'
+    +   '<button onclick="calNext()" style="background:var(--light);border:none;border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer">›</button>'
+    + '</div>'
+    // Week header
+    + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">'
+    + weekDays.map(function(d){ return '<div style="text-align:center;font-size:10px;font-weight:700;color:var(--muted);padding:4px 0">' + d + '</div>'; }).join('')
+    + '</div>'
+    // Grid
+    + '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">';
+
+  // Empty cells before first day
+  for(var e=0; e<firstDay; e++){
+    html += '<div style="min-height:44px"></div>';
+  }
+
+  // Day cells
+  var today = new Date();
+  for(var day=1; day<=daysInMonth; day++){
+    var isToday = today.getDate()===day && today.getMonth()===month && today.getFullYear()===year;
+    var dayReqs = dayMap[day] || [];
+    var hasOpen   = dayReqs.some(function(r){return r.status==='open';});
+    var hasClosed = dayReqs.some(function(r){return r.status==='closed';});
+    var hasAll    = dayReqs.length > 0;
+
+    html += '<div style="min-height:44px;border-radius:8px;padding:3px;'
+      + (isToday ? 'background:var(--light);border:1.5px solid var(--blue);' : 'background:#FAFAFA;border:1px solid #F0F0F0;')
+      + 'position:relative">'
+      + '<div style="font-size:11px;font-weight:' + (isToday?'800':'600') + ';color:' + (isToday?'var(--blue)':'var(--text)') + ';text-align:center;margin-bottom:2px">' + day + '</div>';
+
+    // Request dots/buttons
+    if(dayReqs.length){
+      var maxShow = Math.min(dayReqs.length, 3);
+      for(var ri=0; ri<maxShow; ri++){
+        var r = dayReqs[ri];
+        var dotCol = r.status==='open' ? 'var(--green)' : '#9C27B0';
+        var dotBg  = r.status==='open' ? 'rgba(30,122,75,0.15)' : 'rgba(123,31,162,0.12)';
+        var tipText= r.sev + ' · ' + r.name.substring(0,24) + (r.name.length>24?'…':'');
+        html += '<div class="cal-req-dot" data-val="' + r.id + '" onclick="showRequestModal(this.dataset.val)"'
+          + ' data-tip="' + tipText + '"'
+          + ' style="display:block;background:' + dotBg + ';border-left:2.5px solid ' + dotCol + ';'
+          + 'border-radius:3px;padding:1px 4px;margin-bottom:1px;cursor:pointer;'
+          + 'font-size:9px;font-weight:700;color:' + dotCol + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+          + r.sev
+          + '</div>';
+      }
+      if(dayReqs.length > 3){
+        html += '<div style="font-size:9px;color:var(--muted);text-align:center">+' + (dayReqs.length-3) + '</div>';
+      }
+    }
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+  el.innerHTML = html;
+}
+
+function calPrev(){
+  calMonth--;
+  if(calMonth < 0){ calMonth = 11; calYear--; }
+  renderHistory();
+}
+function calNext(){
+  calMonth++;
+  if(calMonth > 11){ calMonth = 0; calYear++; }
+  renderHistory();
+}
+
+
+// ── VOICE INPUT ──────────────────────────────────────────
+var voiceRecognition = null;
+var voiceActive = false;
+function startVoiceInput(){
+  var btn = document.getElementById('voice-btn');
+  var input = document.getElementById('search-sym');
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    showCallToast('Голосовой ввод не поддерживается'); return;
+  }
+  if(voiceActive){ if(voiceRecognition) voiceRecognition.stop(); voiceActive=false; if(btn){btn.textContent='🎙️';btn.style.transform='translateY(-50%)';} return; }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  voiceRecognition = new SR();
+  voiceRecognition.lang = 'ru-RU'; voiceRecognition.continuous=false; voiceRecognition.interimResults=false;
+  voiceRecognition.onstart = function(){ voiceActive=true; if(btn){btn.textContent='🔴';btn.style.transform='translateY(-50%) scale(1.2)';} showCallToast('🎙️ Говорите...'); };
+  voiceRecognition.onresult = function(e){ var t=e.results[0][0].transcript; if(input){input.value=t;filterSymptoms(t);} showCallToast('✅ '+t); };
+  voiceRecognition.onerror = function(){ showCallToast('Ошибка микрофона. Разрешите доступ.'); };
+  voiceRecognition.onend = function(){ voiceActive=false; if(btn){btn.textContent='🎙️';btn.style.transform='translateY(-50%)';} };
+  voiceRecognition.start();
+}
+function voiceMeasures(id){
+  var ta = document.getElementById('meas-'+id);
+  if(!ta){ showCallToast('Поле не найдено'); return; }
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){ showCallToast('Голосовой ввод не поддерживается'); return; }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var rec = new SR(); rec.lang='ru-RU'; rec.continuous=false; rec.interimResults=false;
+  rec.onstart = function(){ showCallToast('🎙️ Говорите...'); };
+  rec.onresult = function(e){ ta.value += (ta.value?' ':'')+e.results[0][0].transcript; showCallToast('✅ Записано'); };
+  rec.onerror = function(){ showCallToast('Ошибка микрофона'); };
+  rec.start();
+}
+
+// ── DOCS MODULE ──────────────────────────────────────────
+var currentDocsTab = 'registry';
+function showDocsTab(tab){
+  currentDocsTab = tab;
+  ['registry','metrics','measures','report','act','plan'].forEach(function(t){
+    var b=document.getElementById('dt-'+t);
+    if(b){b.style.background=t===tab?'var(--navy)':'#E0E0E0';b.style.color=t===tab?'white':'var(--muted)';}
+  });
+  var el=document.getElementById('docs-content'); if(!el) return;
+  var reqs=getRequests(); var activeMkd=getActiveMKD(); var hmName=localStorage.getItem('hm_name')||'Хаузмастер';
+  if(tab==='registry') el.innerHTML=renderDocsRegistry(reqs);
+  else if(tab==='metrics')  el.innerHTML=renderDocsMetrics(reqs);
+  else if(tab==='measures') el.innerHTML=renderDocsMeasures(reqs);
+  else if(tab==='report')   el.innerHTML=renderDocsReport(reqs,activeMkd,hmName);
+  else if(tab==='act')      el.innerHTML=renderDocsAct(reqs,activeMkd,hmName);
+  else if(tab==='plan')     el.innerHTML=renderDocsPlan(reqs);
+}
+function emptyDocs(msg){ return '<div style="text-align:center;padding:32px 16px;color:var(--muted);font-size:14px">'+msg+'</div>'; }
+function metrCell(label,val,color){
+  return '<div style="background:#F5F5F5;border-radius:7px;padding:7px;text-align:center"><div style="font-size:14px;font-weight:800;color:'+color+'">'+val+'</div><div style="font-size:9px;font-weight:700;color:var(--muted);margin-top:1px">'+label+'</div></div>';
+}
+
+function renderDocsRegistry(reqs){
+  if(!reqs.length) return emptyDocs('Заявок нет.');
+  var domCount={}, sevCount={L1:0,L2:0,L3:0}, perMap={};
+  var domColors={ROOF:'#3E2723',BASE:'#1A3A2A',HEAT:'#7B1A1A',WATR:'#0D3B6E',ELEC:'#1A237E',EMRG:'#7F0000'};
+  reqs.forEach(function(r){
+    var dom=(r.code||'').split('-')[0]||'OTHER'; domCount[dom]=(domCount[dom]||0)+1;
+    if(sevCount[r.sev]!==undefined) sevCount[r.sev]++;
+    var mo=new Date(r.date).toLocaleDateString('ru-RU',{month:'long',year:'numeric'}); perMap[mo]=(perMap[mo]||0)+1;
+  });
+  var h='<div style="background:white;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.07)">'
+    +'<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:10px">Всего: '+reqs.length+'</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:12px">'
+    +['L1','L2','L3'].map(function(s){var c=s==='L3'?'var(--red)':s==='L2'?'#C9A227':'var(--green)';var bg=s==='L3'?'var(--l3)':s==='L2'?'var(--l2)':'var(--l1)';return '<div style="flex:1;background:'+bg+';border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:900;color:'+c+'">'+(sevCount[s]||0)+'</div><div style="font-size:10px;font-weight:700;color:'+c+'">'+s+'</div></div>';}).join('')
+    +'</div><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">По доменам</div>'
+    +Object.keys(domCount).map(function(d){var pct=Math.round(domCount[d]/reqs.length*100);var col=domColors[d]||'var(--steel)';return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="font-weight:700">'+d+'</span><span style="color:var(--muted)">'+domCount[d]+' ('+pct+'%)</span></div><div style="background:#F0F0F0;border-radius:4px;height:6px"><div style="width:'+pct+'%;background:'+col+';height:6px;border-radius:4px"></div></div></div>';}).join('')
+    +'</div><div style="background:white;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.07)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">По периодам</div>'
+    +Object.keys(perMap).map(function(mo){return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F5F5F5;font-size:13px;text-transform:capitalize"><span>'+mo+'</span><span style="font-weight:700;color:var(--navy)">'+perMap[mo]+'</span></div>';}).join('')+'</div>';
+  return h;
+}
+function renderDocsMetrics(reqs){
+  if(!reqs.length) return emptyDocs('Нет данных.');
+  var h='<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Нажми для редактирования метрики</div>';
+  reqs.slice(0,20).forEach(function(r){
+    var insp=r.inspection||{}; var sevBg=r.sev==='L3'?'var(--l3)':r.sev==='L2'?'var(--l2)':'var(--l1)'; var sevCol=r.sev==='L3'?'var(--red)':r.sev==='L2'?'#8B6914':'var(--green)';
+    var d=new Date(r.date).toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
+    h+='<div class="req-card" data-val="'+r.id+'" onclick="showReqInspection(this.dataset.val)" style="background:white;border-radius:10px;padding:12px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,.07);cursor:pointer">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="background:'+sevBg+';color:'+sevCol+';font-size:12px;font-weight:800;padding:3px 8px;border-radius:5px">'+r.sev+'</div><div style="font-size:13px;font-weight:700;color:var(--navy);flex:1">'+r.name+'</div><div style="font-size:11px;color:var(--muted)">'+d+'</div></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">'+metrCell('ECL',insp.ecl||'—','#2196F3')+metrCell('IDI',insp.idi||'—','#FF9800')+metrCell('ITS',insp.its?insp.its+' мин':'—','#4CAF50')+'</div></div>';
+  });
+  return h;
+}
+function renderDocsMeasures(reqs){
+  var open=reqs.filter(function(r){return r.status==='open';});
+  if(!open.length) return '<div style="text-align:center;padding:24px;color:var(--muted)">Открытых заявок нет.</div>';
+  var h='<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Принятые меры по открытым заявкам</div>';
+  open.forEach(function(r){
+    h+='<div style="background:white;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.07)">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">'+r.name+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-bottom:10px">'+r.code+' · '+new Date(r.date).toLocaleDateString('ru-RU')+'</div>'
+      +'<textarea id="meas-'+r.id+'" rows="3" placeholder="Описать принятые меры..." style="width:100%;border:1.5px solid #E0E0E0;border-radius:8px;padding:10px;font-size:14px;font-family:inherit;resize:vertical;outline:none">'+( r.measures||'')+'</textarea>'
+      +'<div style="display:flex;gap:8px;margin-top:8px">'
+      +'<button data-val="'+r.id+'" onclick="saveMeasures(this.dataset.val)" style="flex:1;padding:9px;background:var(--navy);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">💾 Сохранить</button>'
+      +'<button data-val="'+r.id+'" onclick="voiceMeasures(this.dataset.val)" style="padding:9px 13px;background:var(--light);border:none;border-radius:8px;font-size:16px;cursor:pointer" data-tip="Голосовой ввод">🎙️</button>'
+      +'</div></div>';
+  });
+  return h;
+}
+function saveMeasures(id){
+  var ta=document.getElementById('meas-'+id); if(!ta) return;
+  var reqs=getRequests(); var r=reqs.find(function(x){return x.id===id;});
+  if(r){r.measures=ta.value;localStorage.setItem('hm_requests',JSON.stringify(reqs));}
+  showCallToast('💾 Меры сохранены');
+}
+function renderDocsReport(reqs,activeMkd,hmName){
+  var mkdAddr=activeMkd?activeMkd.address:(localStorage.getItem('hm_address')||'МКД не указан');
+  var contract=activeMkd?activeMkd.contract:(localStorage.getItem('hm_contract')||'б/н');
+  var now=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  var open=reqs.filter(function(r){return r.status==='open';}).length;
+  var closed=reqs.filter(function(r){return r.status==='closed';}).length;
+  var l3=reqs.filter(function(r){return r.sev==='L3';}).length;
+  var preview='Отчёт: '+now+' | '+mkdAddr+' | '+hmName+'\nВсего: '+reqs.length+' | Открытых: '+open+' | Закрытых: '+closed+' | Аварийных(L3): '+l3;
+  return '<div style="background:white;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.07)">'
+    +'<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:4px">Отчёт председателю ОСИ</div>'
+    +'<div style="font-size:12px;color:var(--muted);margin-bottom:12px">'+now+' · '+mkdAddr+'</div>'
+    +'<div style="background:var(--mid);border-radius:8px;padding:12px;font-size:12px;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-bottom:12px">'+preview+'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:8px">'
+    +'<button onclick="downloadReport()" style="padding:12px;background:var(--navy);color:white;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer">⬇ Скачать TXT</button>'
+    +'<button data-target="whatsapp" onclick="shareReport(this.dataset.target)" style="padding:12px;background:#1E7A4B;color:white;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer">💬 Отправить в WhatsApp</button>'
+    +'<button data-target="telegram" onclick="shareReport(this.dataset.target)" style="padding:12px;background:#0D3B6E;color:white;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer">✈️ Отправить в Telegram</button>'
+    +'</div></div>';
+}
+function downloadReport(){
+  var reqs=getRequests(); var a=getActiveMKD(); var hmName=localStorage.getItem('hm_name')||'';
+  var mkd=a?a.address:(localStorage.getItem('hm_address')||''); var contract=a?a.contract:(localStorage.getItem('hm_contract')||'');
+  var now=new Date().toLocaleDateString('ru-RU');
+  var text='ОТЧЁТ ХАУЗМАСТЕРА\n====================\nДата: '+now+'\nМКД: '+mkd+'\nКонтракт: '+contract+'\nХаузмастер: '+hmName+'\n\nЗАЯВКИ:\n'
+    +reqs.map(function(r,i){return (i+1)+'. ['+r.sev+'] '+r.name+' | '+r.code+' | '+new Date(r.date).toLocaleDateString('ru-RU')+' | '+(r.status==='open'?'Открыта':'Закрыта')+(r.measures?'\n   Меры: '+r.measures:'');}).join('\n');
+  var blob=new Blob([text],{type:'text/plain;charset=utf-8'}); var url=URL.createObjectURL(blob);
+  var a2=document.createElement('a'); a2.href=url; a2.download='report_'+now.replace(/\./g,'-')+'.txt'; a2.click(); URL.revokeObjectURL(url);
+  showCallToast('Отчёт скачан');
+}
+function shareReport(target){
+  var reqs=getRequests(); var hmName=localStorage.getItem('hm_name')||''; var a=getActiveMKD(); var mkd=a?a.address:''; var now=new Date().toLocaleDateString('ru-RU');
+  var text='ХАУЗМАСТЕР | Отчёт\n'+now+'\n'+mkd+'\n'+hmName+'\nВсего: '+reqs.length+' | Открытых: '+reqs.filter(function(r){return r.status==='open';}).length+'\nСистема ОСИ РК';
+  var msg=encodeURIComponent(text);
+  if(target==='whatsapp') window.open('https://wa.me/?text='+msg,'_blank');
+  else window.open('https://t.me/share/url?url=&text='+msg,'_blank');
+}
+function renderDocsAct(reqs,activeMkd,hmName){
+  if(!reqs.length) return emptyDocs('Нет заявок для акта.');
+  var h='<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Выбери заявку для акта</div>';
+  reqs.slice(0,15).forEach(function(r){
+    var d=new Date(r.date).toLocaleDateString('ru-RU'); var sevBg=r.sev==='L3'?'var(--l3)':r.sev==='L2'?'var(--l2)':'var(--l1)'; var sevCol=r.sev==='L3'?'var(--red)':r.sev==='L2'?'#8B6914':'var(--green)';
+    h+='<div style="background:white;border-radius:10px;padding:12px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,.07);display:flex;align-items:center;gap:10px">'
+      +'<div style="background:'+sevBg+';color:'+sevCol+';font-size:12px;font-weight:800;padding:3px 8px;border-radius:5px;flex-shrink:0">'+r.sev+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--navy)">'+r.name+'</div><div style="font-size:11px;color:var(--muted)">'+d+' · '+r.code+'</div></div>'
+      +'<button data-val="'+r.id+'" onclick="generateAct(this.dataset.val)" style="padding:7px 11px;background:var(--navy);color:white;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">📝 Акт</button>'
+      +'</div>';
+  });
+  return h;
+}
+function generateAct(id){
+  var reqs=getRequests(); var r=reqs.find(function(x){return x.id===id;}); if(!r) return;
+  var a=getActiveMKD(); var mkd=a?a.address:(localStorage.getItem('hm_address')||''); var contract=a?a.contract:(localStorage.getItem('hm_contract')||''); var hmName=localStorage.getItem('hm_name')||'';
+  var d=new Date(r.date).toLocaleString('ru-RU'); var insp=r.inspection||{};
+  var text='АКТ ОБСЛЕДОВАНИЯ\n====================\nДата: '+d+'\nМКД: '+mkd+'\nКонтракт: '+contract+'\nХаузмастер: '+hmName
+    +'\n\nЗАЯВКА:\nID: '+r.id+'\nКод: '+r.code+'\nSeverity: '+r.sev+'\nСимптом: '+r.name
+    +'\n\nМЕТРИКА:\nECL: '+(insp.ecl||'—')+'\nIDI: '+(insp.idi||'—')+'\nITS: '+(insp.its?insp.its+' мин':'—')
+    +'\nОписание: '+(insp.description||'—')
+    +'\n\nМЕРЫ:\n'+(r.measures||'—')
+    +'\nСтатус: '+(r.status==='open'?'Открыта':'Закрыта')
+    +'\n\n====================\nПодпись: ______________  Дата: ______________\nСистема ОСИ РК';
+  var blob=new Blob([text],{type:'text/plain;charset=utf-8'}); var url=URL.createObjectURL(blob);
+  var a2=document.createElement('a'); a2.href=url; a2.download='act_'+r.id+'.txt'; a2.click(); URL.revokeObjectURL(url);
+  showCallToast('📝 Акт скачан');
+}
+function renderDocsPlan(reqs){
+  var open=reqs.filter(function(r){return r.status==='open';});
+  if(!open.length) return '<div style="text-align:center;padding:24px;color:var(--muted)">Открытых заявок нет.</div>';
+  open.sort(function(a,b){return ({L3:0,L2:1,L1:2}[a.sev]||3)-({L3:0,L2:1,L1:2}[b.sev]||3);});
+  var h='<div style="background:white;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.07)"><div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:10px">План мероприятий — '+open.length+' заявок</div>';
+  open.forEach(function(r){
+    var sevBg=r.sev==='L3'?'var(--l3)':r.sev==='L2'?'var(--l2)':'var(--l1)'; var sevCol=r.sev==='L3'?'var(--red)':r.sev==='L2'?'#8B6914':'var(--green)';
+    var sla=r.sev==='L3'?'SLA: 1–2 ч':r.sev==='L2'?'SLA: 24 ч':'SLA: 5–10 р.д.';
+    h+='<div style="border:1.5px solid #F0F0F0;border-radius:9px;padding:11px;margin-bottom:8px">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="background:'+sevBg+';color:'+sevCol+';font-size:11px;font-weight:800;padding:2px 7px;border-radius:4px">'+r.sev+'</div><div style="font-size:13px;font-weight:700;color:var(--navy);flex:1">'+r.name+'</div></div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+r.code+' · <span style="color:'+sevCol+';font-weight:700">'+sla+'</span></div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<input id="plan-resp-'+r.id+'" type="text" placeholder="Ответственный..." value="'+(r.responsible||'')+'" style="flex:1;border:1px solid #E0E0E0;border-radius:7px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit">'
+      +'<input id="plan-due-'+r.id+'"  type="date" value="'+(r.dueDate||'')+'" style="border:1px solid #E0E0E0;border-radius:7px;padding:7px 8px;font-size:12px;outline:none;font-family:inherit">'
+      +'<button data-val="'+r.id+'" onclick="savePlanItem(this.dataset.val)" style="padding:7px 11px;background:var(--navy);color:white;border:none;border-radius:7px;font-size:12px;cursor:pointer">💾</button>'
+      +'</div></div>';
+  });
+  return h+'</div>';
+}
+function savePlanItem(id){
+  var resp=document.getElementById('plan-resp-'+id); var due=document.getElementById('plan-due-'+id);
+  var reqs=getRequests(); var r=reqs.find(function(x){return x.id===id;});
+  if(r){if(resp)r.responsible=resp.value;if(due)r.dueDate=due.value;localStorage.setItem('hm_requests',JSON.stringify(reqs));}
+  showCallToast('✅ Сохранено');
+}
+function showReqInspection(id){
+  var reqs=getRequests(); var r=reqs.find(function(x){return x.id===id;}); if(!r) return;
+  var insp=r.inspection||{};
+  document.getElementById('modal-inner').innerHTML=
+    '<div class="modal-handle"></div>'
+    +'<div class="modal-header"><div class="modal-title" style="font-size:16px">'+r.name+'</div><div class="modal-sub">'+r.code+' · '+r.sev+'</div></div>'
+    +'<div class="modal-section"><div class="modal-label">Метрика осмотра</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">'
+    +'<div style="background:var(--light);border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">ECL</div><select id="insp-ecl" style="width:100%;border:none;background:none;font-size:15px;font-weight:800;color:#2196F3;text-align:center;cursor:pointer">'+['—','1','2','3','4'].map(function(v){return '<option'+(insp.ecl===v?' selected':'')+'>'+v+'</option>';}).join('')+'</select></div>'
+    +'<div style="background:var(--light);border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">IDI</div><select id="insp-idi" style="width:100%;border:none;background:none;font-size:15px;font-weight:800;color:#FF9800;text-align:center;cursor:pointer">'+['—','1','2','3','4'].map(function(v){return '<option'+(insp.idi===v?' selected':'')+'>'+v+'</option>';}).join('')+'</select></div>'
+    +'<div style="background:var(--light);border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">ITS (мин)</div><input id="insp-its" type="number" value="'+(insp.its||'')+'" placeholder="0" style="width:100%;border:none;background:none;font-size:15px;font-weight:800;color:#4CAF50;text-align:center;outline:none"></div>'
+    +'</div>'
+    +'<div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Описание осмотра</div>'
+    +'<textarea id="insp-desc" rows="3" placeholder="Что осмотрено, выявленные дефекты..." style="width:100%;border:1.5px solid #E0E0E0;border-radius:8px;padding:9px;font-size:14px;font-family:inherit;resize:vertical;outline:none">'+(insp.description||'')+'</textarea></div>'
+    +'</div>'
+    +'<div style="padding:0 16px 16px;display:flex;gap:8px">'
+    +'<button data-val="'+r.id+'" onclick="saveInspection(this.dataset.val)" style="flex:1;padding:13px;background:var(--navy);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">💾 Сохранить</button>'
+    +'<button onclick="closeModalBtn()" style="padding:13px 16px;background:var(--light);color:var(--navy);border:none;border-radius:10px;font-size:14px;cursor:pointer">Отмена</button>'
+    +'</div>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function saveInspection(id){
+  var ecl=document.getElementById('insp-ecl').value; var idi=document.getElementById('insp-idi').value;
+  var its=document.getElementById('insp-its').value; var desc=document.getElementById('insp-desc').value;
+  var reqs=getRequests(); var r=reqs.find(function(x){return x.id===id;});
+  if(r){r.inspection={ecl:ecl,idi:idi,its:its,description:desc};localStorage.setItem('hm_requests',JSON.stringify(reqs));}
+  closeModalBtn(); showCallToast('✅ Метрика сохранена'); showDocsTab('metrics');
+}
+
+
+// ── INSPECTION MODAL ─────────────────────────────────────
+// Full observation window for each symptom
+var inspPhotos = [];   // base64 photos for current session
+var inspSymIdx = -1;   // current symptom index
+var inspVoiceRec = null;
+
+function showInspectionModal(idx){
+  inspSymIdx  = idx;
+  inspPhotos  = [];
+  var sym = SYMPTOMS[idx];
+  if(!sym) return;
+
+  var sevBg  = sym.sev==='L3'?'var(--l3)':sym.sev==='L2'?'var(--l2)':'var(--l1)';
+  var sevCol = sym.sev==='L3'?'var(--red)':sym.sev==='L2'?'#8B6914':'var(--green)';
+  var sevTip = sym.sev==='L3'?'Авария · SLA 1-2ч':sym.sev==='L2'?'Срочно · SLA 24ч':'Плановый · SLA 5-10 р.д.';
+
+  var causesHTML = sym.detail.causes.map(function(c,i){
+    return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #F5F5F5;font-size:13px">'
+      +'<span style="color:var(--blue);flex-shrink:0">▸</span><span>'+c+'</span></div>';
+  }).join('');
+
+  var stepsHTML = sym.detail.steps.map(function(st,i){
+    return '<div style="display:flex;gap:10px;margin-bottom:8px">'
+      +'<div style="width:24px;height:24px;background:var(--navy);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">'+(i+1)+'</div>'
+      +'<div style="font-size:13px;line-height:1.5;padding-top:3px">'+st+'</div>'
+      +'</div>';
+  }).join('');
+
+  // Responsibility
+  var respHTML = '';
+  if(sym.resp){
+    respHTML = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">'
+      +'<div style="background:var(--light);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px">🏢</div><div style="font-size:9px;font-weight:800;color:var(--navy);margin:2px 0">ОСИ</div><div style="font-size:10px;color:var(--muted);line-height:1.3">'+sym.resp.osi+'</div></div>'
+      +'<div style="background:var(--l1);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px">🧰</div><div style="font-size:9px;font-weight:800;color:var(--green);margin:2px 0">ХАУЗМАСТЕР</div><div style="font-size:10px;color:var(--muted);line-height:1.3">'+sym.resp.hm+'</div></div>'
+      +'<div style="background:var(--l2);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px">👤</div><div style="font-size:9px;font-weight:800;color:#8B6914;margin:2px 0">ЖИТЕЛЬ</div><div style="font-size:10px;color:var(--muted);line-height:1.3">'+sym.resp.owner+'</div></div>'
+      +'</div>';
+  }
+
+  document.getElementById('modal-inner').innerHTML =
+    '<div class="modal-handle"></div>'
+    // Header
+    +'<div style="padding:0 16px 10px">'
+    +  '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+    +    '<div style="font-size:28px">'+sym.icon+'</div>'
+    +    '<div style="flex:1"><div style="font-size:17px;font-weight:800;color:var(--navy);line-height:1.2">'+sym.name+'</div>'
+    +      '<div style="font-size:12px;color:var(--muted);margin-top:2px">'+sym.action+'</div></div>'
+    +    '<span style="background:'+sevBg+';color:'+sevCol+';border:1.5px solid '+sevCol+';border-radius:6px;padding:3px 9px;font-size:12px;font-weight:800;cursor:help" data-tip="'+sevTip+'">'+sym.sev+'</span>'
+    +  '</div>'
+    +  '<div style="display:flex;gap:6px">'
+    +    '<button onclick="goToChecklist(\''+CARD_TO_DOMAIN[sym.card]+'\')" style="background:var(--light);color:var(--blue);border:1.5px solid var(--blue);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer">'+sym.card+' ↗</button>'
+    +  '</div>'
+    +'</div>'
+
+    // Responsibility
+    +(respHTML ? '<div style="padding:0 16px 8px">'+respHTML+'</div>' : '')
+
+    // Voice assistant
+    +'<div style="padding:0 16px 10px">'
+    +  '<div style="background:var(--navy);border-radius:10px;padding:12px">'
+    +    '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px">🎙️ Голосовой помощник</div>'
+    +    '<div style="display:flex;gap:8px;align-items:flex-end">'
+    +      '<textarea id="insp-voice-text" placeholder="Опишите что видите... или нажмите микрофон" rows="2" '
+    +        'style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:8px;'
+    +        'padding:9px;font-size:13px;color:white;resize:none;outline:none;font-family:inherit;::placeholder{color:rgba(255,255,255,0.4)}"></textarea>'
+    +      '<button onclick="startInspVoice()" id="insp-voice-btn" data-tip="Голосовой ввод"'
+    +        ' style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;width:42px;height:42px;font-size:20px;cursor:pointer;flex-shrink:0">🎙️</button>'
+    +    '</div>'
+    +  '</div>'
+    +'</div>'
+
+    // Causes
+    +'<div style="padding:0 16px 8px">'
+    +  '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Возможные причины</div>'
+    +  causesHTML
+    +'</div>'
+
+    // Steps
+    +'<div style="padding:0 16px 8px">'
+    +  '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Алгоритм осмотра</div>'
+    +  stepsHTML
+    +'</div>'
+
+    // Photo + Metrics
+    +'<div style="padding:0 16px 8px">'
+    +  '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Фотофиксация и метрика</div>'
+    +  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+    +    '<button onclick="inspTakePhoto()" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;background:var(--l1);border:1.5px solid var(--green);border-radius:9px;font-size:13px;font-weight:700;color:var(--green);cursor:pointer">📷 Фото</button>'
+    +    '<button onclick="inspTakeVideo()" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;background:var(--light);border:1.5px solid var(--blue);border-radius:9px;font-size:13px;font-weight:700;color:var(--blue);cursor:pointer">🎥 Видео</button>'
+    +  '</div>'
+    +  '<div id="insp-photos-preview" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>'
+    +  '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">'
+    +    '<div style="background:var(--light);border-radius:8px;padding:8px;text-align:center">'
+    +      '<div style="font-size:10px;color:var(--muted);margin-bottom:4px">ECL</div>'
+    +      '<select id="insp-modal-ecl" style="width:100%;border:none;background:none;font-size:15px;font-weight:800;color:#2196F3;text-align:center;cursor:pointer">'
+    +      ['—','1','2','3','4'].map(function(v){return '<option>'+v+'</option>';}).join('')
+    +      '</select>'
+    +    '</div>'
+    +    '<div style="background:var(--light);border-radius:8px;padding:8px;text-align:center">'
+    +      '<div style="font-size:10px;color:var(--muted);margin-bottom:4px">IDI</div>'
+    +      '<select id="insp-modal-idi" style="width:100%;border:none;background:none;font-size:15px;font-weight:800;color:#FF9800;text-align:center;cursor:pointer">'
+    +      ['—','1','2','3','4'].map(function(v){return '<option>'+v+'</option>';}).join('')
+    +      '</select>'
+    +    '</div>'
+    +    '<div style="background:var(--light);border-radius:8px;padding:8px;text-align:center">'
+    +      '<div style="font-size:10px;color:var(--muted);margin-bottom:4px">ITS мин</div>'
+    +      '<input id="insp-modal-its" type="number" placeholder="0" '
+    +        'style="width:100%;border:none;background:none;font-size:15px;font-weight:800;color:#4CAF50;text-align:center;outline:none">'
+    +    '</div>'
+    +  '</div>'
+    // Object selector
+    +  '<div style="display:flex;gap:8px;margin-bottom:8px">'
+    +    '<div style="flex:1">'
+    +      '<div style="font-size:10px;color:var(--muted);margin-bottom:4px">Объект</div>'
+    +      '<select id="insp-modal-obj" style="width:100%;border:1.5px solid #E0E0E0;border-radius:8px;padding:8px;font-size:13px;outline:none;font-family:inherit">'
+    +        '<option value="common">🏢 Общедомовой</option>'
+    +        '<option value="apt">🏠 Квартира</option>'
+    +      '</select>'
+    +    '</div>'
+    +    '<div style="flex:1" id="insp-apt-wrap" style="display:none">'
+    +      '<div style="font-size:10px;color:var(--muted);margin-bottom:4px">№ квартиры</div>'
+    +      '<input id="insp-modal-apt" type="number" placeholder="42" '
+    +        'style="width:100%;border:1.5px solid #E0E0E0;border-radius:8px;padding:8px;font-size:13px;outline:none;font-family:inherit">'
+    +    '</div>'
+    +  '</div>'
+    +'</div>'
+
+    // Save button
+    +'<div style="padding:0 16px 20px;display:flex;flex-direction:column;gap:8px">'
+    +  '<button onclick="saveInspectionToHistory()" '
+    +    'style="padding:14px;background:var(--navy);color:white;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer">'
+    +    '💾 Внести в историю и реестр</button>'
+    +  '<button onclick="closeModalBtn()" '
+    +    'style="padding:12px;background:var(--light);color:var(--navy);border:none;border-radius:10px;font-size:14px;cursor:pointer">'
+    +    'Закрыть</button>'
+    +'</div>';
+
+  // Show apt field when apt selected
+  setTimeout(function(){
+    var objSel = document.getElementById('insp-modal-obj');
+    var aptWrap = document.getElementById('insp-apt-wrap');
+    if(objSel && aptWrap){
+      objSel.onchange = function(){
+        aptWrap.style.display = objSel.value==='apt' ? 'block' : 'none';
+      };
+    }
+  }, 50);
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// Voice for inspection modal
+function startInspVoice(){
+  var btn = document.getElementById('insp-voice-btn');
+  var ta  = document.getElementById('insp-voice-text');
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    showCallToast('Голосовой ввод не поддерживается'); return;
+  }
+  if(inspVoiceRec){ inspVoiceRec.stop(); inspVoiceRec=null; if(btn)btn.textContent='🎙️'; return; }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  inspVoiceRec = new SR(); inspVoiceRec.lang='ru-RU'; inspVoiceRec.continuous=true; inspVoiceRec.interimResults=false;
+  inspVoiceRec.onstart = function(){ if(btn){btn.textContent='🔴';btn.style.background='rgba(192,57,43,0.3)';} showCallToast('🎙️ Говорите...'); };
+  inspVoiceRec.onresult = function(e){
+    var t=e.results[e.results.length-1][0].transcript;
+    if(ta) ta.value += (ta.value?'\n':'')+t;
+  };
+  inspVoiceRec.onerror = function(){ showCallToast('Ошибка микрофона'); };
+  inspVoiceRec.onend = function(){ inspVoiceRec=null; if(btn){btn.textContent='🎙️';btn.style.background='rgba(255,255,255,0.15)';} };
+  inspVoiceRec.start();
+}
+
+// Photo capture
+function inspTakePhoto(){
+  var inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.capture='environment';
+  inp.onchange = function(e){
+    var file = e.target.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      inspPhotos.push({type:'photo', name:file.name, data:ev.target.result});
+      renderInspPhotos();
+      showCallToast('📷 Фото добавлено ('+inspPhotos.length+')');
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+function inspTakeVideo(){
+  var inp = document.createElement('input');
+  inp.type='file'; inp.accept='video/*'; inp.capture='environment';
+  inp.onchange = function(e){
+    var file = e.target.files[0]; if(!file) return;
+    inspPhotos.push({type:'video', name:file.name});
+    renderInspPhotos();
+    showCallToast('🎥 Видео прикреплено');
+  };
+  inp.click();
+}
+function renderInspPhotos(){
+  var el = document.getElementById('insp-photos-preview'); if(!el) return;
+  el.innerHTML = inspPhotos.map(function(p,i){
+    return '<div style="position:relative;flex-shrink:0">'
+      +(p.type==='photo' && p.data
+        ? '<img src="'+p.data+'" style="width:56px;height:56px;object-fit:cover;border-radius:7px;border:2px solid var(--green)">'
+        : '<div style="width:56px;height:56px;background:var(--light);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:22px">🎥</div>')
+      +'<button data-idx="'+i+'" onclick="removeInspPhoto(parseInt(this.dataset.idx))" '
+        +'style="position:absolute;top:-4px;right:-4px;background:var(--red);color:white;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function removeInspPhoto(i){
+  inspPhotos.splice(i,1);
+  renderInspPhotos();
+}
+
+// Save inspection → history with structured ID
+function saveInspectionToHistory(){
+  var sym = SYMPTOMS[inspSymIdx]; if(!sym) return;
+  var activeMkd = getActiveMKD();
+  var mkdAddr   = activeMkd ? activeMkd.address  : (localStorage.getItem('hm_address')||'МКД');
+  var contract  = activeMkd ? activeMkd.contract : (localStorage.getItem('hm_contract')||'б/н');
+
+  var ecl  = (document.getElementById('insp-modal-ecl')  || {}).value || '—';
+  var idi  = (document.getElementById('insp-modal-idi')  || {}).value || '—';
+  var its  = (document.getElementById('insp-modal-its')  || {}).value || '';
+  var desc = (document.getElementById('insp-voice-text') || {}).value || '';
+  var objType = (document.getElementById('insp-modal-obj') || {}).value || 'common';
+  var aptNum  = (document.getElementById('insp-modal-apt') || {}).value || '';
+
+  // Build structured ID: №квартиры(или ОД)/дата/№заявки
+  var now   = new Date();
+  var dateStr = now.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit'}).replace(/\./g,'');
+  var reqs  = getRequests();
+  var reqNum = String(reqs.length + 1).padStart(3,'0');
+  var objCode = objType==='apt' ? 'КВ'+aptNum : 'ОД';
+  var reqId   = objCode + '-' + dateStr + '-' + reqNum;
+
+  var newReq = {
+    id:        reqId,
+    date:      now.toISOString(),
+    mkd:       mkdAddr,
+    contract:  contract,
+    code:      sym.card,
+    name:      sym.name,
+    sev:       sym.sev,
+    status:    'open',
+    object:    objType==='apt' ? 'Квартира №'+aptNum : 'Общедомовой',
+    photos:    inspPhotos.map(function(p){return p.name;}),
+    inspection:{ ecl:ecl, idi:idi, its:its, description:desc },
+    measures:  '',
+  };
+
+  reqs.unshift(newReq);
+  try { localStorage.setItem('hm_requests', JSON.stringify(reqs.slice(0,200))); } catch(e){}
+
+  closeModalBtn();
+  showCallToast('✅ Заявка '+reqId+' внесена в историю');
+}
+
 function stopBubble(e){ e.stopPropagation(); }
 
 // ── NAV SELECTOR ─────────────────────────────────────────
