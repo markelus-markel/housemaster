@@ -1026,10 +1026,11 @@ function renderContacts(){
       +   '<div class="contact-name">' + c.name + '</div>'
       +   '<div class="contact-when">' + c.when + '</div>'
       + '</div>'
-      + '<button class="call-btn" onclick="handleCall(event,'' + c.num + '')" data-tip="Набрать ' + c.num + '" '
-      +   'style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;'
-      +   'width:48px;height:48px;background:var(--emrg);color:white;border-radius:10px;font-size:20px;'
-      +   'box-shadow:0 2px 8px rgba(127,0,0,0.4);border:none;cursor:pointer">📞</button>'
+      + '<button class="call-btn" data-phone="' + c.num + '" onclick="callFromBtn(this,event)"'
+      +   ' data-tip="Набрать ' + c.num + '"'
+      +   ' style="display:inline-flex;align-items:center;justify-content:center;'
+      +   'width:48px;height:48px;background:var(--emrg);color:white;border-radius:10px;'
+      +   'font-size:20px;box-shadow:0 2px 8px rgba(127,0,0,0.4);border:none;cursor:pointer">📞</button>'
       + '</div>';
   }).join('');
 }
@@ -1048,12 +1049,12 @@ function renderSops(filter){
   el.innerHTML = filtered.map(function(sop){
     var callsHTML = sop.calls.map(function(c, i){
       var cls = 'emrg-call-btn' + (i===0 ? ' emrg-call-primary' : '');
-      return '<button class="' + cls + '" '
-        + 'onclick="stopBubble(event);handleCall(event,'' + c.num + '')" '
+      return '<button class="' + cls + '" data-phone="' + c.num + '" '
+        + 'onclick="stopBubble(event);callFromBtn(this,event)" '
         + 'style="border:none;cursor:pointer">'
         + c.label + '</button>';
     }).join('');
-    return '<div class="emrg-card" onclick="showSopModal('' + sop.code + '')">'
+    return '<div class="emrg-card" onclick="showSopModal(\' + sop.code + \')">'
       + '<div class="emrg-header">'
       +   '<div class="emrg-code">' + sop.code + '</div>'
       +   '<div class="emrg-name">' + sop.name + '</div>'
@@ -1066,7 +1067,6 @@ function renderSops(filter){
       + '</div>';
   }).join('');
 }
-
 function showSopModal(code){
   const sop = SOPS.find(x=>x.code===code);
   if(!sop) return;
@@ -1076,7 +1076,7 @@ function showSopModal(code){
     const isPrimary = i===0;
     const bg = isPrimary ? 'var(--emrg)' : 'var(--light)';
     const col = isPrimary ? 'white' : 'var(--navy)';
-    return '<button onclick="handleCall(event,\''+c.num+'\')" '
+    return '<button onclick="handleCall(event,\\'+c.num+'\')" '
       + 'style="background:'+bg+';color:'+col+';border:none;border-radius:8px;'
       + 'padding:10px 16px;font-weight:800;font-size:15px;cursor:pointer;'
       + 'box-shadow:0 2px 6px rgba(0,0,0,0.15)">'
@@ -1258,11 +1258,9 @@ function showSymptomModal(idx){
     +   '<div class="modal-title">' + sym.name + '</div>'
     +   '<div class="modal-sub">' + sym.action + '</div>'
     +   '<div class="badge-row" style="margin-top:10px">'
-    +     '<button onclick="goToChecklist('' + domKey + '')" data-tip="Открыть чек-лист ' + sym.card + '" style="' + cardBtnStyle + '"'
-    +       ' onmouseover="this.style.background='var(--blue)';this.style.color='white'"'
-    +       ' onmouseout="this.style.background='var(--light)';this.style.color='var(--blue)'">'
+    +     '<button onclick="goToChecklist(\' + domKey + \')" data-tip="Открыть чек-лист ' + sym.card + '" style="' + cardBtnStyle + '"'
     +       sym.card + ' ↗</button>'
-    +     '<button onclick="showSevInfo('' + sym.sev + '')" data-tip="' + sevTip + '" style="' + levBtnStyle + '">'
+    +     '<button onclick="showSevInfo(\' + sym.sev + \')" data-tip="' + sevTip + '" style="' + levBtnStyle + '">'
     +       sym.sev + ' ↗</button>'
     +   '</div>'
     + '</div>'
@@ -1280,13 +1278,13 @@ function showSymptomModal(idx){
     +   '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">'
     +     '<button onclick="actionPhoto()" style="' + actStyle + 'background:#1A3A2A"><span style="font-size:20px">📷</span><span style="font-size:11px;font-weight:700">Фото</span></button>'
     +     '<button onclick="actionVideo()" style="' + actStyle + 'background:#0D3B6E"><span style="font-size:20px">🎥</span><span style="font-size:11px;font-weight:700">Видео</span></button>'
-    +     '<button onclick="actionSave('' + esc(sym.name) + '','' + sym.card + '','' + sym.sev + '','' + esc(causesStr) + '','' + esc(stepsStr) + '')" style="' + actStyle + 'background:#1B3A5C"><span style="font-size:20px">💾</span><span style="font-size:11px;font-weight:700">Сохранить</span></button>'
+    +     '<button onclick="actionSaveCurrent()" style="' + actStyle + 'background:#1B3A5C"><span style="font-size:20px">💾</span><span style="font-size:11px;font-weight:700">Сохранить</span></button>'
     +   '</div>'
     +   '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">'
-    +     '<button onclick="actionShare('' + esc(sym.name) + '','' + sym.card + '','' + sym.sev + '','' + esc(causesStr) + '','' + esc(stepsStr) + '','share')" style="' + actStyle + 'background:#4A7FA5"><span style="font-size:18px">📤</span><span style="font-size:10px;font-weight:700">Отправить</span></button>'
-    +     '<button onclick="actionShare('' + esc(sym.name) + '','' + sym.card + '','' + sym.sev + '','' + esc(causesStr) + '','' + esc(stepsStr) + '','whatsapp')" style="' + actStyle + 'background:#1E7A4B"><span style="font-size:18px">💬</span><span style="font-size:10px;font-weight:700">WhatsApp</span></button>'
-    +     '<button onclick="actionShare('' + esc(sym.name) + '','' + sym.card + '','' + sym.sev + '','' + esc(causesStr) + '','' + esc(stepsStr) + '','telegram')" style="' + actStyle + 'background:#0D3B6E"><span style="font-size:18px">✈️</span><span style="font-size:10px;font-weight:700">Telegram</span></button>'
-    +     '<button onclick="actionOSI('' + esc(sym.name) + '','' + sym.card + '','' + sym.sev + '')" style="' + actStyle + 'background:#7B1A1A"><span style="font-size:18px">🏢</span><span style="font-size:10px;font-weight:700">Председатель</span></button>'
+    +     '<button onclick="actionShareCurrent(\'share\'" style="' + actStyle + 'background:#4A7FA5"><span style="font-size:18px">📤</span><span style="font-size:10px;font-weight:700">Отправить</span></button>'
+    +     '<button onclick="actionShareCurrent(\'whatsapp\'" style="' + actStyle + 'background:#1E7A4B"><span style="font-size:18px">💬</span><span style="font-size:10px;font-weight:700">WhatsApp</span></button>'
+    +     '<button onclick="actionShareCurrent(\'telegram\'" style="' + actStyle + 'background:#0D3B6E"><span style="font-size:18px">✈️</span><span style="font-size:10px;font-weight:700">Telegram</span></button>'
+    +     '<button onclick="actionOSICurrent()" style="' + actStyle + 'background:#7B1A1A"><span style="font-size:18px">🏢</span><span style="font-size:10px;font-weight:700">Председатель</span></button>'
     +   '</div>'
     + '</div>'
     + '<div style="padding:8px 16px 16px">'
@@ -1321,6 +1319,21 @@ function actionVideo(){
 }
 
 // ─── SAVE AS FILE ─────────────────────────────────────────────────────────
+
+function actionSaveCurrent(){
+  var sym = SYMPTOMS[currentSymIdx]; if(!sym) return;
+  actionSave(sym.name, sym.card, sym.sev,
+    sym.detail.causes.join(' / '), sym.detail.steps.join(' → '));
+}
+function actionShareCurrent(target){
+  var sym = SYMPTOMS[currentSymIdx]; if(!sym) return;
+  actionShare(sym.name, sym.card, sym.sev,
+    sym.detail.causes.join(', '), sym.detail.steps.join('. '), target);
+}
+function actionOSICurrent(){
+  var sym = SYMPTOMS[currentSymIdx]; if(!sym) return;
+  actionOSI(sym.name, sym.card, sym.sev);
+}
 function actionSave(name, card, sev, causes, steps){
   var activeMkd = getActiveMKD();
   var contract = activeMkd ? activeMkd.contract : (localStorage.getItem('hm_contract')||'б/н');
@@ -1405,8 +1418,6 @@ function showOSISetup(name, card, sev){
           value="${localStorage.getItem('hm_osi_phone')||''}"
           style="width:100%;padding:12px 14px;border:1.5px solid #E0E0E0;border-radius:10px;
                  font-size:16px;outline:none;font-family:inherit;transition:border-color 0.15s"
-          onfocus="this.style.borderColor='var(--blue)'"
-          onblur="this.style.borderColor='#E0E0E0'">
       </div>
       <div>
         <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">ID контракта на обслуживание МКД</div>
@@ -1414,8 +1425,6 @@ function showOSISetup(name, card, sev){
           value="${localStorage.getItem('hm_contract')||''}"
           style="width:100%;padding:12px 14px;border:1.5px solid #E0E0E0;border-radius:10px;
                  font-size:16px;outline:none;font-family:inherit;transition:border-color 0.15s"
-          onfocus="this.style.borderColor='var(--blue)'"
-          onblur="this.style.borderColor='#E0E0E0'">
       </div>
     </div>
     <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:8px">
@@ -1469,7 +1478,7 @@ function sendToOSI(phone, contract, name, card, sev){
     +   '<div class="modal-sub">' + phone + (contract ? ' · Контракт: ' + contract : '') + '</div>'
     + '</div>'
     + '<div style="padding:0 16px 8px;display:flex;flex-direction:column;gap:10px">'
-    +   '<button onclick="handleCall(event,'' + phone + '')" '
+    +   '<button onclick="handleCall(event,\' + phone + \')" '
     +     'style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;'
     +     'background:var(--navy);color:white;border-radius:10px;font-size:15px;font-weight:700;border:none;cursor:pointer;width:100%">'
     +     '📞 Позвонить председателю</button>'
@@ -1481,7 +1490,7 @@ function sendToOSI(phone, contract, name, card, sev){
     +     'style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;'
     +     'background:#0D3B6E;color:white;border-radius:10px;text-decoration:none;font-size:15px;font-weight:700">'
     +     '✈️ Написать в Telegram</a>'
-    +   '<button onclick="showOSISetup('' + name + '','' + card + '','' + sev + '')" '
+    +   '<button onclick="showOSISetup(\' + name + \',\' + card + \',\' + sev + \')" '
     +     'style="padding:11px;background:var(--light);color:var(--muted);border:none;border-radius:10px;font-size:13px;cursor:pointer">'
     +     '✏️ Изменить номер / контракт</button>'
     +   '<button onclick="closeModalBtn()" '
@@ -1495,7 +1504,7 @@ function renderDomainTabs(){
     var isActive = d.key === currentDomain;
     var bg = isActive ? d.color : '#E0E0E0';
     var col = isActive ? 'white' : 'var(--muted)';
-    return '<button onclick="selectDomain('' + d.key + '')" id="tab-' + d.key + '" '
+    return '<button onclick="selectDomain(\' + d.key + \')" id="tab-' + d.key + '" '
       + 'data-tip="' + d.label + ': осмотр ' + d.items.length + ' точек" '
       + 'style="padding:7px 14px;border-radius:20px;border:none;font-size:13px;font-weight:700;'
       + 'cursor:pointer;background:' + bg + ';color:' + col + '">'
@@ -1522,7 +1531,7 @@ function renderChecklist(){
         ? 'background:var(--green);border:2px solid var(--green);color:white;'
         : 'background:white;border:2px solid #CCC;');
     var textStyle = 'font-size:15px;line-height:1.5;' + (checked ? 'color:var(--muted);text-decoration:line-through;' : '');
-    return '<div class="checklist-item' + (checked?' checked':'') + '" onclick="toggleCheck('' + k + '')">'
+    return '<div class="checklist-item' + (checked?' checked':'') + '" onclick="toggleCheck(\' + k + \')">'
       + '<div class="check-box" style="' + (checked?'background:var(--green);border-color:var(--green);color:white;':'') + '">' + (checked?'✓':'') + '</div>'
       + '<div>'
       +   '<div class="check-text">' + item.text + '</div>'
@@ -1863,7 +1872,7 @@ function renderMKDList(){
     var iconBg = isActive ? 'var(--gold)' : 'var(--light)';
     var callHTML = m.osi_phone
       ? '<div style="display:flex;border-top:1px solid #F0F0F0">'
-        + '<button onclick="handleCall(event,'' + m.osi_phone + '')" '
+        + '<button onclick="handleCall(event,\' + m.osi_phone + \')" '
         +   'style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;'
         +   'background:none;border:none;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer">📞 Председатель</button>'
         + '<a href="https://wa.me/' + m.osi_phone.replace(/\D/g,'') + '" target="_blank" '
@@ -1873,7 +1882,7 @@ function renderMKDList(){
       : '';
     var actionBtn = isActive
       ? '<span style="font-size:11px;font-weight:700;color:var(--gold);padding:6px">✓ Активен</span>'
-      : '<button onclick="setActiveMKD('' + m.id + '')" style="padding:6px 10px;background:var(--navy);color:white;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">Выбрать</button>';
+      : '<button onclick="setActiveMKD(\' + m.id + \')" style="padding:6px 10px;background:var(--navy);color:white;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">Выбрать</button>';
 
     return '<div style="background:white;border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:' + border + '">'
       + '<div style="padding:14px 16px;display:flex;align-items:center;gap:12px">'
@@ -1885,7 +1894,7 @@ function renderMKDList(){
       +   '</div>'
       +   '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
       +     actionBtn
-      +     '<button onclick="deleteMKD('' + m.id + '')" style="padding:6px 10px;background:var(--l3);color:var(--red);border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">Удалить</button>'
+      +     '<button onclick="deleteMKD(\' + m.id + \')" style="padding:6px 10px;background:var(--l3);color:var(--red);border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">Удалить</button>'
       +   '</div>'
       + '</div>'
       + callHTML
@@ -1922,7 +1931,6 @@ function showAddMKD(){
       + '<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px">' + f.label + '</div>'
       + '<input id="' + f.id + '" type="' + f.type + '" placeholder="' + f.ph + '" '
       + 'style="width:100%;padding:11px 13px;border:1.5px solid #E0E0E0;border-radius:10px;font-size:15px;outline:none;font-family:inherit" '
-      + 'onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='#E0E0E0'">'
       + '</div>';
   }).join('');
 
@@ -2032,8 +2040,8 @@ function renderHistory(){
         +   '<div><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:' + (isOpen?'var(--l2)':'var(--l1)') + ';color:' + (isOpen?'#8B6914':'var(--green)') + '">' + (isOpen?'Открыта':'Закрыта') + '</span></div>'
         + '</div>'
         + '<div style="display:flex;border-top:1px solid #F8F8F8">'
-        +   '<button onclick="toggleRequestStatus('' + r.id + '')" style="flex:1;padding:9px;background:none;border:none;font-size:12px;font-weight:700;color:' + (isOpen?'var(--green)':'#8B6914') + ';cursor:pointer">' + (isOpen?'✓ Закрыть':'↺ Открыть снова') + '</button>'
-        +   '<button onclick="deleteRequest('' + r.id + '')" style="padding:9px 14px;background:none;border:none;border-left:1px solid #F0F0F0;font-size:12px;font-weight:700;color:var(--red);cursor:pointer">Удалить</button>'
+        +   '<button onclick="toggleRequestStatus(\' + r.id + \')" style="flex:1;padding:9px;background:none;border:none;font-size:12px;font-weight:700;color:' + (isOpen?'var(--green)':'#8B6914') + ';cursor:pointer">' + (isOpen?'✓ Закрыть':'↺ Открыть снова') + '</button>'
+        +   '<button onclick="deleteRequest(\' + r.id + \')" style="padding:9px 14px;background:none;border:none;border-left:1px solid #F0F0F0;font-size:12px;font-weight:700;color:var(--red);cursor:pointer">Удалить</button>'
         + '</div>'
         + '</div>';
     });
@@ -2165,7 +2173,7 @@ function showNormTab(tab){
       return '<div style="background:white;border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.07)">'
         + '<div style="padding:14px 16px;background:var(--steel);display:flex;align-items:center;justify-content:space-between">'
         +   '<div style="font-size:15px;font-weight:800;color:white">' + t.title + '</div>'
-        +   '<button onclick="downloadActTemplate('' + t.id + '')" style="background:white;color:var(--navy);border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">⬇ Скачать</button>'
+        +   '<button onclick="downloadActTemplate(\' + t.id + \')" style="background:white;color:var(--navy);border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">⬇ Скачать</button>'
         + '</div>'
         + '<div style="padding:12px 16px">'
         +   '<div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px">Поля акта</div>'
@@ -2210,6 +2218,7 @@ function downloadActTemplate(id){
   showCallToast('📝 Шаблон скачан: ' + tmpl.title);
 }
 function stopBubble(e){ e.stopPropagation(); }
+function callFromBtn(el, e){ e = e||event; handleCall(e, el.getAttribute('data-phone')); }
 
 // ═══════════════════════════════════════════════════════
 // INIT — script at bottom of <body>, DOM already ready.
