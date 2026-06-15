@@ -1,0 +1,20 @@
+{
+  "name": "Хаузмастер — ОСИ РК",
+  "short_name": "Хаузмастер",
+  "description": "Полевой справочник хаузмастера системы ОСИ Республики Казахстан",
+  "start_url": "/housemaster/",
+  "display": "standalone",
+  "background_color": "#1B3A5C",
+  "theme_color": "#1B3A5C",
+  "orientation": "portrait",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231B3A5C'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle'%3E%F0%9F%A0%8F%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/housemaster/"
+}
