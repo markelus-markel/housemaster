@@ -619,7 +619,7 @@
 <!-- МКД PAGE -->
 <div class="page" id="page-mkd">
   <div style="background:var(--navy);padding:48px 16px 16px">
-    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">База МКД</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><button onclick="showPage('emrg')" style="background:rgba(255,255,255,0.12);border:none;border-radius:7px;padding:5px 10px;color:white;font-size:12px;font-weight:700;cursor:pointer">← Главная</button></div><div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">База МКД</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.5)">Дома под обслуживанием</div>
   </div>
   <div style="padding:12px 16px 4px">
@@ -641,7 +641,7 @@
 <!-- HISTORY PAGE -->
 <div class="page" id="page-history">
   <div style="background:var(--navy);padding:48px 16px 16px">
-    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">История заявок</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><button onclick="showPage('emrg')" style="background:rgba(255,255,255,0.12);border:none;border-radius:7px;padding:5px 10px;color:white;font-size:12px;font-weight:700;cursor:pointer">← Главная</button></div><div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">История заявок</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.5)" id="history-sub">Все МКД</div>
   </div>
   <div style="padding:12px 16px 4px;display:flex;gap:6px;flex-wrap:wrap" id="history-filters">
@@ -655,7 +655,7 @@
 <!-- NORMATIVKA PAGE -->
 <div class="page" id="page-norms">
   <div style="background:var(--navy);padding:48px 16px 16px">
-    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">Нормативная база</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><button onclick="showPage('emrg')" style="background:rgba(255,255,255,0.12);border:none;border-radius:7px;padding:5px 10px;color:white;font-size:12px;font-weight:700;cursor:pointer">← Главная</button></div><div style="font-size:20px;font-weight:800;color:white;margin-bottom:4px">Нормативная база</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.5)">Законы РК · Шаблоны актов</div>
   </div>
   <div style="padding:12px 16px 4px;display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px" id="norm-tabs">
@@ -691,11 +691,55 @@
     <button class="nav-btn" id="nav-norms" onclick="showPage('norms')" data-tip="Нормативная база РК">
       <span class="icon">⚖️</span>Законы
     </button>
-    <button class="nav-btn" style="opacity:0;pointer-events:none"><span class="icon"></span></button>
+    <button class="nav-btn" id="nav-nav" onclick="showNavSelector()" data-tip="Все разделы">
+      <span class="icon">☰</span>Навигация
+    </button>
   </div>
 </nav>
 
 <!-- MODAL -->
+<!-- NAV SELECTOR -->
+<div id="nav-selector" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:flex-end;justify-content:center">
+  <div style="background:white;width:100%;max-width:480px;border-radius:16px 16px 0 0;padding-bottom:24px">
+    <div style="width:36px;height:4px;background:#DDD;border-radius:2px;margin:12px auto 16px"></div>
+    <div style="padding:0 16px 12px;font-size:16px;font-weight:800;color:var(--navy)">Все разделы</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px">
+      <button onclick="navTo('emrg')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--l3);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">🚨</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--emrg)">Аварии</div><div style="font-size:11px;color:var(--muted)">Контакты и SOP</div></div>
+      </button>
+      <button onclick="navTo('symptoms')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">🔍</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Симптомы</div><div style="font-size:11px;color:var(--muted)">Что случилось?</div></div>
+      </button>
+      <button onclick="navTo('checks')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">☑</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Чек-лист</div><div style="font-size:11px;color:var(--muted)">Плановый осмотр</div></div>
+      </button>
+      <button onclick="navTo('ref')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">📖</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Справка</div><div style="font-size:11px;color:var(--muted)">Глоссарий RU/KZ</div></div>
+      </button>
+      <button onclick="navTo('mkd')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">🏢</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">МКД</div><div style="font-size:11px;color:var(--muted)">База домов</div></div>
+      </button>
+      <button onclick="navTo('history')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">📅</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">История</div><div style="font-size:11px;color:var(--muted)">Заявки</div></div>
+      </button>
+      <button onclick="navTo('norms')" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--light);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">⚖️</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--navy)">Законы</div><div style="font-size:11px;color:var(--muted)">НПА и шаблоны</div></div>
+      </button>
+      <button onclick="closeNavSelector()" style="display:flex;align-items:center;gap:10px;padding:14px;background:var(--mid);border:none;border-radius:12px;cursor:pointer;text-align:left">
+        <span style="font-size:24px">✕</span>
+        <div><div style="font-size:14px;font-weight:700;color:var(--muted)">Закрыть</div></div>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" id="modal-content">
     <div class="modal-handle"></div>
@@ -2029,7 +2073,7 @@ function renderHistory(){
     items.forEach(function(r){
       var timeStr = new Date(r.date).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
       var isOpen = r.status==='open';
-      html += '<div style="background:white;border-radius:12px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden">'
+      html += '<div class="req-card" data-val="' + r.id + '" onclick="showRequestModal(this.dataset.val)"'
         + '<div style="padding:12px 14px;display:flex;align-items:flex-start;gap:10px">'
         +   '<div style="width:36px;height:36px;border-radius:8px;flex-shrink:0;background:' + sevBg(r.sev) + ';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:' + sevCol(r.sev) + '">' + r.sev + '</div>'
         +   '<div style="flex:1">'
@@ -2218,6 +2262,132 @@ function downloadActTemplate(id){
   showCallToast('📝 Шаблон скачан: ' + tmpl.title);
 }
 function stopBubble(e){ e.stopPropagation(); }
+
+// ── NAV SELECTOR ─────────────────────────────────────────
+function showNavSelector(){
+  var el = document.getElementById('nav-selector');
+  el.style.display = 'flex';
+}
+function closeNavSelector(){
+  var el = document.getElementById('nav-selector');
+  el.style.display = 'none';
+}
+function navTo(page){
+  closeNavSelector();
+  showPage(page);
+}
+
+// ── REQUEST MODAL (История заявок — Вариант А) ────────────
+function showRequestModal(id){
+  var reqs = getRequests();
+  var r = reqs.find(function(x){ return x.id === id; });
+  if(!r) return;
+
+  var sevBg  = r.sev==='L3'?'var(--l3)':r.sev==='L2'?'var(--l2)':'var(--l1)';
+  var sevCol = r.sev==='L3'?'var(--red)':r.sev==='L2'?'#8B6914':'var(--green)';
+  var isOpen = r.status === 'open';
+  var dateStr = new Date(r.date).toLocaleString('ru-RU',{
+    day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'
+  });
+
+  document.getElementById('modal-inner').innerHTML =
+    '<div class="modal-handle"></div>'
+    + '<div class="modal-header">'
+    +   '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+    +     '<div style="width:44px;height:44px;border-radius:10px;background:' + sevBg + ';'
+    +       'display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;'
+    +       'color:' + sevCol + ';flex-shrink:0">' + r.sev + '</div>'
+    +     '<div>'
+    +       '<div class="modal-title" style="font-size:16px">' + r.name + '</div>'
+    +       '<div class="modal-sub">' + r.code + '</div>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="modal-section">'
+    +   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+    +     '<div style="background:var(--light);border-radius:10px;padding:12px">'
+    +       '<div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:3px">МКД</div>'
+    +       '<div style="font-size:13px;font-weight:600">' + (r.mkd||'—') + '</div>'
+    +     '</div>'
+    +     '<div style="background:var(--light);border-radius:10px;padding:12px">'
+    +       '<div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:3px">КОНТРАКТ</div>'
+    +       '<div style="font-size:13px;font-weight:600">' + (r.contract||'—') + '</div>'
+    +     '</div>'
+    +     '<div style="background:var(--light);border-radius:10px;padding:12px">'
+    +       '<div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:3px">ДАТА И ВРЕМЯ</div>'
+    +       '<div style="font-size:13px;font-weight:600">' + dateStr + '</div>'
+    +     '</div>'
+    +     '<div style="background:' + sevBg + ';border-radius:10px;padding:12px">'
+    +       '<div style="font-size:10px;color:' + sevCol + ';font-weight:700;letter-spacing:0.5px;margin-bottom:3px">СТАТУС</div>'
+    +       '<div style="font-size:13px;font-weight:700;color:' + sevCol + '">' + (isOpen?'🔴 Открыта':'✅ Закрыта') + '</div>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+    + '<div style="padding:0 16px 8px;display:flex;flex-direction:column;gap:8px">'
+    +   '<button data-val="' + r.id + '" onclick="toggleReqFromModal(this.dataset.val)" '
+    +     'style="padding:13px;background:' + (isOpen?'var(--l1)':'var(--l2)') + ';color:' + (isOpen?'var(--green)':'#8B6914') + ';'
+    +     'border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">'
+    +     (isOpen ? '✓ Закрыть заявку' : '↺ Открыть снова') + '</button>'
+    +   '<button data-val="' + r.id + '" data-target="whatsapp" onclick="shareReqBtn(this)" '
+    +     'style="padding:13px;background:#1E7A4B;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">'
+    +     '💬 Отправить в WhatsApp</button>'
+    +   '<button data-val="' + r.id + '" data-target="telegram" onclick="shareReqBtn(this)" '
+    +     'style="padding:13px;background:#0D3B6E;color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">'
+    +     '✈️ Отправить в Telegram</button>'
+    +   '<button data-val="' + r.id + '" onclick="deleteReqFromModal(this.dataset.val)" '
+    +     'style="padding:11px;background:var(--l3);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">'
+    +     '🗑 Удалить заявку</button>'
+    +   '<button onclick="closeModalBtn()" '
+    +     'style="padding:11px;background:var(--mid);color:var(--muted);border:none;border-radius:10px;font-size:14px;cursor:pointer">'
+    +     'Закрыть</button>'
+    + '</div>';
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function toggleReqFromModal(id){
+  var reqs = getRequests();
+  var r = reqs.find(function(x){ return x.id===id; });
+  if(r){ r.status = r.status==='open' ? 'closed' : 'open'; }
+  localStorage.setItem('hm_requests', JSON.stringify(reqs));
+  closeModalBtn();
+  renderHistory();
+  showCallToast(r && r.status==='closed' ? '✅ Заявка закрыта' : '↺ Заявка открыта снова');
+}
+
+function deleteReqFromModal(id){
+  if(!confirm('Удалить эту заявку?')) return;
+  var reqs = getRequests().filter(function(x){ return x.id!==id; });
+  localStorage.setItem('hm_requests', JSON.stringify(reqs));
+  closeModalBtn();
+  renderHistory();
+  showCallToast('🗑 Заявка удалена');
+}
+
+function shareReqBtn(el){ actionShareRequest(el.dataset.id||el.dataset.val, el.dataset.target); }
+function actionShareRequest(id, target){
+  var reqs = getRequests();
+  var r = reqs.find(function(x){ return x.id===id; });
+  if(!r) return;
+  var dateStr = new Date(r.date).toLocaleString('ru-RU');
+  var text = '🏠 ХАУЗМАСТЕР | Заявка\n'
+    + '──────────────────\n'
+    + '📋 ' + r.code + ' | ' + r.sev + '\n'
+    + '🔍 ' + r.name + '\n'
+    + '🏢 МКД: ' + (r.mkd||'—') + '\n'
+    + '📄 Контракт: ' + (r.contract||'б/н') + '\n'
+    + '🕐 ' + dateStr + '\n'
+    + '📌 Статус: ' + (r.status==='open'?'Открыта':'Закрыта') + '\n'
+    + '──────────────────\n'
+    + 'Система ОСИ РК';
+  var msg = encodeURIComponent(text);
+  if(target==='whatsapp'){
+    window.open('https://wa.me/?text=' + msg, '_blank');
+  } else {
+    window.open('https://t.me/share/url?url=&text=' + msg, '_blank');
+  }
+}
+
 function callFromBtn(el, e){ e = e||event; handleCall(e, el.getAttribute('data-phone')); }
 
 // ═══════════════════════════════════════════════════════
