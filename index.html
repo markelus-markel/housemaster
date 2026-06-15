@@ -779,6 +779,23 @@
 </div>
 
 <script>
+// ── GLOBAL LOOKUP TABLES ─────────────────────────────────
+var CARD_TO_DOMAIN = {
+  'ROOF-INS-001':'roof','ROOF-INS-002':'roof','ROOF-INS-003':'roof','ROOF-INS-004':'roof','ROOF-INS-005':'roof',
+  'BASE-INS-001':'base','BASE-INS-002':'base','BASE-INS-003':'base','BASE-INS-004':'base',
+  'HEAT-INS-001':'heat','HEAT-INS-002':'heat','HEAT-INS-003':'heat','HEAT-INS-004':'heat',
+  'WATR-INS-001':'watr','WATR-INS-002':'watr','WATR-INS-003':'watr',
+  'ELEC-INS-001':'elec','ELEC-INS-002':'elec','ELEC-INS-003':'elec',
+  'EMRG-SOP-006':'base','EMRG-SOP-007':'base',
+};
+
+var SEV_INFO = {
+  'L1': {label:'L1 — Плановый',   sla:'5–10 р.д.', desc:'Нет угрозы безопасности.',          action:'Зафиксировать. Плановый ремонт.'},
+  'L2': {label:'L2 — Срочный',    sla:'≤ 24 часа', desc:'Нарушение комфорта или риск роста.', action:'Выезд. Подрядчик. Уведомить ОСИ.'},
+  'L3': {label:'L3 — Аварийный',  sla:'1–2 часа',  desc:'Угроза жизни или конструкции.',      action:'Вызов служб. Эвакуация. ОСИ немедленно.'},
+};
+
+
 // ═══════════════════════════════════════════════════════
 // DATA — from Housemaster Handbook MVP 1.0
 // ═══════════════════════════════════════════════════════
@@ -2737,7 +2754,7 @@ function showInspectionModal(idx){
     +    '<span style="background:'+sevBg+';color:'+sevCol+';border:1.5px solid '+sevCol+';border-radius:6px;padding:3px 9px;font-size:12px;font-weight:800;cursor:help" data-tip="'+sevTip+'">'+sym.sev+'</span>'
     +  '</div>'
     +  '<div style="display:flex;gap:6px">'
-    +    '<button onclick="goToChecklist(\''+CARD_TO_DOMAIN[sym.card]+'\')" style="background:var(--light);color:var(--blue);border:1.5px solid var(--blue);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer">'+sym.card+' ↗</button>'
+    +    '<button data-domain="' + (CARD_TO_DOMAIN[sym.card]||'') + '" onclick="goToChecklist(this.dataset.domain)" style="background:var(--light);color:var(--blue);border:1.5px solid var(--blue);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer">' + sym.card + ' ↗</button>'
     +  '</div>'
     +'</div>'
 
