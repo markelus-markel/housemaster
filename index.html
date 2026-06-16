@@ -692,11 +692,105 @@
   <div style="padding:0 16px 16px" id="norms-content"></div>
 </div>
 
+<!-- VISION AI PAGE -->
+<div class="page" id="page-vision">
+  <div id="vis-topbar" style="background:var(--navy);padding:48px 16px 14px;position:sticky;top:0;z-index:10">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <button onclick="showPage('emrg')" style="background:rgba(255,255,255,0.12);border:none;border-radius:7px;padding:5px 10px;color:white;font-size:12px;font-weight:700;cursor:pointer">← Главная</button>
+      <div style="flex:1;font-size:18px;font-weight:800;color:white">AI Осмотр</div>
+      <span style="font-size:10px;background:rgba(29,158,117,0.3);color:#5DCAA5;padding:3px 8px;border-radius:20px;border:1px solid rgba(29,158,117,0.4);font-weight:700">BETA</span>
+    </div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.5)">Наведи камеру · AI определит объект · Получи регламент</div>
+  </div>
+
+  <div id="vis-cam-wrap" style="position:relative;background:#0a0f1a;width:100%;aspect-ratio:4/3;overflow:hidden">
+    <div id="vis-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,255,255,0.35)">
+      <div style="font-size:52px">📷</div>
+      <div style="font-size:13px">Камера не активна</div>
+    </div>
+    <video id="vis-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:none"></video>
+    <img id="vis-preview" alt="" style="width:100%;height:100%;object-fit:cover;display:none;position:absolute;top:0;left:0" />
+    <canvas id="vis-canvas" style="display:none"></canvas>
+    <div id="vis-corners" style="position:absolute;inset:0;pointer-events:none">
+      <div style="position:absolute;top:14px;left:14px;width:22px;height:22px;border-top:2px solid rgba(255,255,255,0.65);border-left:2px solid rgba(255,255,255,0.65)"></div>
+      <div style="position:absolute;top:14px;right:14px;width:22px;height:22px;border-top:2px solid rgba(255,255,255,0.65);border-right:2px solid rgba(255,255,255,0.65)"></div>
+      <div style="position:absolute;bottom:14px;left:14px;width:22px;height:22px;border-bottom:2px solid rgba(255,255,255,0.65);border-left:2px solid rgba(255,255,255,0.65)"></div>
+      <div style="position:absolute;bottom:14px;right:14px;width:22px;height:22px;border-bottom:2px solid rgba(255,255,255,0.65);border-right:2px solid rgba(255,255,255,0.65)"></div>
+    </div>
+    <div id="vis-scan" style="position:absolute;left:14px;right:14px;height:1px;background:rgba(0,200,140,0.55);top:14px;display:none"></div>
+    <div id="vis-domain-tag" style="display:none;position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.7);color:#5DCAA5;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;border:1px solid #1D9E75"></div>
+    <div id="vis-sev-tag" style="display:none;position:absolute;bottom:12px;right:12px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px"></div>
+  </div>
+
+  <div style="padding:12px 14px;background:#111b2b;border-top:1px solid rgba(255,255,255,0.07)">
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="vis-btn-cam" onclick="visCamToggle()" style="flex:1;background:#1D9E75;color:white;border:none;border-radius:10px;padding:11px 0;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        <span>📷</span> Включить камеру
+      </button>
+      <button id="vis-btn-snap" onclick="visCapture()" style="display:none;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px 16px;font-size:14px;font-weight:700;cursor:pointer">
+        🔍 Анализ
+      </button>
+      <label style="display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:11px 14px;cursor:pointer;font-size:18px" title="Загрузить фото">
+        🖼
+        <input type="file" id="vis-file" accept="image/*" onchange="visFileLoad(event)" style="display:none">
+      </label>
+    </div>
+    <div id="vis-error" style="display:none;margin-top:8px;background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.35);border-radius:8px;padding:9px 12px;color:#E74C3C;font-size:12px"></div>
+  </div>
+
+  <div id="vis-thinking" style="display:none;padding:14px 16px;background:#0d1b2a">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(29,158,117,0.08);border:1px solid rgba(29,158,117,0.2);border-radius:10px">
+      <div id="vis-dots" style="display:flex;gap:4px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#5DCAA5;animation:visDot 1.2s ease-in-out infinite" class="vdot"></span>
+        <span style="width:7px;height:7px;border-radius:50%;background:#5DCAA5;animation:visDot 1.2s ease-in-out 0.2s infinite" class="vdot"></span>
+        <span style="width:7px;height:7px;border-radius:50%;background:#5DCAA5;animation:visDot 1.2s ease-in-out 0.4s infinite" class="vdot"></span>
+      </div>
+      <div style="font-size:13px;color:#5DCAA5" id="vis-think-txt">Анализирую объект МКД...</div>
+    </div>
+  </div>
+
+  <div id="vis-result" style="display:none;padding:12px 14px 80px;background:#f4f6f8">
+    <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:10px">
+      <div style="background:var(--navy);padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:#1D9E75;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔧</div>
+        <div style="flex:1">
+          <div style="font-size:10px;color:#5DCAA5;font-weight:700;letter-spacing:0.05em">ХАУЗМАСТЕР · ОСМОТР</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.45)" id="vis-res-code"></div>
+        </div>
+        <button id="vis-voice-btn" onclick="visSpeak()" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:16px;cursor:pointer;display:none" title="Прослушать">🔊</button>
+      </div>
+      <div style="padding:14px" id="vis-res-body"></div>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px">Рекомендуемые действия</div>
+    <div id="vis-actions"></div>
+
+    <button onclick="visReset()" style="width:100%;background:white;border:1px solid #E0E0E0;border-radius:10px;padding:11px;font-size:14px;color:var(--muted);cursor:pointer;margin-top:4px">↺ Новый осмотр</button>
+  </div>
+</div>
+
+<style>
+@keyframes visDot { 0%,80%,100%{opacity:.3;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+@keyframes visScan { 0%{top:14px} 50%{top:calc(100% - 14px)} 100%{top:14px} }
+.vis-scan-anim { animation: visScan 2s ease-in-out infinite !important; }
+.vis-action-card {
+  background: white; border-radius: 10px; padding: 11px 13px;
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.vis-act-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.vis-act-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.vis-act-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+</style>
+
 <!-- BOTTOM NAV -->
 <nav class="bottomnav" style="flex-direction:column;height:auto">
   <div style="display:flex;width:100%;border-bottom:1px solid #F0F0F0">
     <button class="nav-btn emrg-btn active" id="nav-emrg" onclick="showPage('emrg')" data-tip="Аварийные контакты и SOP">
       <span class="icon">🚨</span>Аварии
+    </button>
+    <button class="nav-btn" id="nav-vision" onclick="showPage('vision')" data-tip="AI Осмотр с камерой">
+      <span class="icon">🤖</span>AI Осмотр
     </button>
     <button class="nav-btn" id="nav-symptoms" onclick="showPage('symptoms')" data-tip="Обследование объекта">
       <span class="icon">🔍</span>Обследование
@@ -3113,6 +3207,156 @@ checkOnboarding();
     if(sub) sub.textContent = active.address;
   }
 })();
+
+// ── VISION AI MODULE ─────────────────────────────────────────────────────────
+(function(){
+  var visStream = null;
+  var visCamOn = false;
+  var visLastText = '';
+
+  window.visCamToggle = function(){
+    if(visCamOn){ visStopCam(); return; }
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:960}}})
+    .then(function(s){
+      visStream = s;
+      visCamOn = true;
+      var v = document.getElementById('vis-video');
+      v.srcObject = s; v.style.display='block';
+      document.getElementById('vis-placeholder').style.display='none';
+      document.getElementById('vis-preview').style.display='none';
+      document.getElementById('vis-btn-cam').innerHTML='<span>⏹</span> Остановить';
+      document.getElementById('vis-btn-cam').style.background='rgba(255,255,255,0.12)';
+      document.getElementById('vis-btn-snap').style.display='inline-flex';
+      var sc=document.getElementById('vis-scan'); sc.style.display='block'; sc.classList.add('vis-scan-anim');
+    }).catch(function(){ visShowError('Камера недоступна. Загрузите фото.'); });
+  };
+
+  function visStopCam(){
+    if(visStream) visStream.getTracks().forEach(function(t){t.stop();});
+    visStream=null; visCamOn=false;
+    var v=document.getElementById('vis-video'); v.style.display='none';
+    document.getElementById('vis-btn-cam').innerHTML='<span>📷</span> Включить камеру';
+    document.getElementById('vis-btn-cam').style.background='#1D9E75';
+    document.getElementById('vis-btn-snap').style.display='none';
+    var sc=document.getElementById('vis-scan'); sc.style.display='none'; sc.classList.remove('vis-scan-anim');
+  }
+
+  window.visCapture = function(){
+    var v=document.getElementById('vis-video');
+    var c=document.getElementById('vis-canvas');
+    c.width=v.videoWidth||640; c.height=v.videoHeight||480;
+    c.getContext('2d').drawImage(v,0,0);
+    visStopCam();
+    var prev=document.getElementById('vis-preview');
+    prev.src=c.toDataURL('image/jpeg',0.85); prev.style.display='block';
+    document.getElementById('vis-placeholder').style.display='none';
+    visAnalyze(c.toDataURL('image/jpeg',0.85));
+  };
+
+  window.visFileLoad = function(e){
+    var file=e.target.files[0]; if(!file) return;
+    var r=new FileReader();
+    r.onload=function(ev){
+      var prev=document.getElementById('vis-preview');
+      prev.src=ev.target.result; prev.style.display='block';
+      document.getElementById('vis-placeholder').style.display='none';
+      visStopCam();
+      visAnalyze(ev.target.result);
+    };
+    r.readAsDataURL(file);
+  };
+
+  function visAnalyze(dataUrl){
+    visShowError('');
+    document.getElementById('vis-result').style.display='none';
+    document.getElementById('vis-thinking').style.display='block';
+    document.getElementById('vis-btn-snap').style.display='none';
+    var sc=document.getElementById('vis-scan'); sc.style.display='block'; sc.classList.add('vis-scan-anim');
+    var thinkMsgs=['Анализирую объект МКД...','Определяю домен...','Формирую рекомендации...'];
+    var ti=0;
+    var thinkInt=setInterval(function(){
+      var el=document.getElementById('vis-think-txt');
+      if(el) el.textContent=thinkMsgs[ti%thinkMsgs.length]; ti++;
+    },1800);
+    var b64=dataUrl.split(',')[1];
+    var mm=(dataUrl.match(/data:(image\/\w+);/)||['','image/jpeg'])[1];
+    var sys='Ты — Хаузмастер AI, технический инспектор МКД в системе ОСИ Республики Казахстан.\n\nЗАДАЧА: проанализировать фото объекта МКД и дать профессиональное техническое заключение хаузмастера.\n\nПРАВИЛА:\n1. Определи домен: ROOF/HEAT/WATER/SEWER/ELEC/BASE/FACADE/ENTRY/ELEV/FIRE/TERR\n2. Severity: L1 (наблюдение/норма), L2 (требует устранения), L3 (аварийность)\n3. Описывай только наблюдаемые признаки — не делай строительных экспертных выводов\n4. Профессиональный но понятный язык\n\nФОРМАТ — только JSON без markdown:\n{\"domain\":\"ROOF\",\"code\":\"ROOF-L2-004\",\"severity\":\"L2\",\"object\":\"Что на фото (1 предложение)\",\"findings\":\"Профессиональные наблюдения хаузмастера (3-4 предложения. Только факты.)\",\"actions\":[{\"type\":\"warn\",\"emoji\":\"⚠️\",\"title\":\"Действие\",\"sub\":\"Пояснение/SLA\"},{\"type\":\"info\",\"emoji\":\"📷\",\"title\":\"Действие\",\"sub\":\"Пояснение\"},{\"type\":\"ok\",\"emoji\":\"📋\",\"title\":\"Действие\",\"sub\":\"Пояснение\"}]}\nТипы: red=аварийное, warn=срочное, info=рабочее, ok=плановое.\nОтвечай ТОЛЬКО JSON.';
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:sys,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mm,data:b64}},{type:'text',text:'Проанализируй объект МКД на фото.'}]}]})
+    }).then(function(r){return r.json();}).then(function(data){
+      clearInterval(thinkInt);
+      var txt=data.content.filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+      var clean=txt.replace(/```json|```/g,'').trim();
+      var res=JSON.parse(clean);
+      visShowResult(res);
+    }).catch(function(){
+      clearInterval(thinkInt);
+      document.getElementById('vis-thinking').style.display='none';
+      document.getElementById('vis-scan').classList.remove('vis-scan-anim');
+      visShowError('Ошибка анализа. Попробуйте другое фото или повторите.');
+    });
+  }
+
+  function visShowResult(r){
+    document.getElementById('vis-thinking').style.display='none';
+    document.getElementById('vis-scan').style.display='none';
+    var domTag=document.getElementById('vis-domain-tag');
+    domTag.textContent=r.domain||'HM'; domTag.style.display='block';
+    var sevTag=document.getElementById('vis-sev-tag');
+    sevTag.textContent=r.severity||'L1'; sevTag.style.display='block';
+    var sevMap={L1:['rgba(30,122,75,0.15)','#1E7A4B','#1D9E75'],L2:['rgba(201,162,39,0.15)','#8B6914','#C9A227'],L3:['rgba(192,57,43,0.15)','#C0392B','#E74C3C']};
+    var sc=sevMap[r.severity]||sevMap.L1;
+    sevTag.style.background=sc[0]; sevTag.style.color=sc[1]; sevTag.style.border='1px solid '+sc[2];
+    document.getElementById('vis-res-code').textContent=r.code||'';
+    document.getElementById('vis-res-body').innerHTML='<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px">ОБЪЕКТ: '+visEsc(r.object||'')+'</div><div style="font-size:14px;line-height:1.65;color:var(--text)">'+visEsc(r.findings||'')+'</div>';
+    var actDiv=document.getElementById('vis-actions');
+    actDiv.innerHTML='';
+    (r.actions||[]).forEach(function(a){
+      var d=document.createElement('div');
+      d.className='vis-action-card';
+      d.style.borderLeft='3px solid '+(a.type==='red'?'#C0392B':a.type==='warn'?'#C9A227':a.type==='ok'?'#1E7A4B':'#2E6DA4');
+      d.innerHTML='<div class="vis-act-icon">'+visEsc(a.emoji||'✅')+'</div><div><div class="vis-act-title">'+visEsc(a.title)+'</div><div class="vis-act-sub">'+visEsc(a.sub||'')+'</div></div>';
+      actDiv.appendChild(d);
+    });
+    visLastText=(r.object||'')+'. '+(r.findings||'')+'. '+(r.actions||[]).map(function(a){return a.title;}).join('. ');
+    document.getElementById('vis-voice-btn').style.display='flex';
+    document.getElementById('vis-result').style.display='block';
+  }
+
+  window.visSpeak = function(){
+    if(!visLastText||!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(visLastText);
+    u.lang='ru-RU'; u.rate=0.95;
+    var btn=document.getElementById('vis-voice-btn');
+    btn.textContent='🔈'; u.onend=function(){btn.textContent='🔊';};
+    speechSynthesis.speak(u);
+  };
+
+  window.visReset = function(){
+    document.getElementById('vis-preview').style.display='none';
+    document.getElementById('vis-placeholder').style.display='flex';
+    document.getElementById('vis-result').style.display='none';
+    document.getElementById('vis-domain-tag').style.display='none';
+    document.getElementById('vis-sev-tag').style.display='none';
+    document.getElementById('vis-voice-btn').style.display='none';
+    document.getElementById('vis-file').value='';
+    document.getElementById('vis-btn-snap').style.display='none';
+    document.getElementById('vis-btn-cam').innerHTML='<span>📷</span> Включить камеру';
+    document.getElementById('vis-btn-cam').style.background='#1D9E75';
+    if(window.speechSynthesis) speechSynthesis.cancel();
+    visLastText='';
+  };
+
+  function visShowError(msg){
+    var el=document.getElementById('vis-error');
+    if(msg){el.textContent=msg;el.style.display='block';}else{el.style.display='none';}
+  }
+  function visEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+})();
+
 </script>
 </body>
 </html>
