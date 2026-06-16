@@ -765,6 +765,9 @@
     <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px">Рекомендуемые действия</div>
     <div id="vis-actions"></div>
 
+    <div id="vis-save-link" style="display:none;margin-bottom:8px">
+      <button data-rid="" onclick="openActFromVision(this.dataset.rid)" style="width:100%;background:var(--navy);color:white;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer">📄 Открыть Акт обследования</button>
+    </div>
     <button onclick="visReset()" style="width:100%;background:white;border:1px solid #E0E0E0;border-radius:10px;padding:11px;font-size:14px;color:var(--muted);cursor:pointer;margin-top:4px">↺ Новый осмотр</button>
   </div>
 </div>
@@ -2744,6 +2747,32 @@ function generateAct(id){
   var a2=document.createElement('a'); a2.href=url; a2.download='act_'+r.id+'.txt'; a2.click(); URL.revokeObjectURL(url);
   showCallToast('📝 Акт скачан');
 }
+function generateActPDF(id){
+  var reqs=getRequests(); var r=reqs.find(function(x){return x.id===id;}); if(!r) return;
+  var a=getActiveMKD();
+  var mkd=a?a.address:(localStorage.getItem('hm_address')||'МКД не указан');
+  var contract=a?a.contract:(localStorage.getItem('hm_contract')||'б/н');
+  var hmName=localStorage.getItem('hm_name')||'Хаузмастер';
+  var d=new Date(r.date);
+  var dateStr=d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  var timeStr=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  var actNum='HM-A1-'+r.id.slice(-6);
+  var sevLabel=r.sev==='L3'?'L3 — Высокий риск / аварийность':r.sev==='L2'?'L2 — Требует устранения':'L1 — Наблюдение / низкий риск';
+  var sevColor=r.sev==='L3'?'#C0392B':r.sev==='L2'?'#8B6914':'#1E7A4B';
+  var actionsHtml=(r.visActions||[]).map(function(ac,i){
+    return '<tr><td style="padding:6px 8px;border:1px solid #ddd;font-weight:700;color:'+sevColor+'">'+(i+1)+'</td><td style="padding:6px 8px;border:1px solid #ddd">'+ac.title+'</td><td style="padding:6px 8px;border:1px solid #ddd;color:#666">'+ac.sub+'</td></tr>';
+  }).join('');
+  var html='<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Акт '+actNum+'</title>'    +'<style>'    +'*{box-sizing:border-box;margin:0;padding:0}'    +'body{font-family:Arial,sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:20px}'    +'.header{text-align:center;border-bottom:2px solid #1B3A5C;padding-bottom:14px;margin-bottom:16px}'    +'.org{font-size:11px;color:#666;margin-bottom:4px}'    +'h1{font-size:16px;font-weight:900;color:#1B3A5C;margin-bottom:4px}'    +'.act-num{font-size:12px;color:#888}'    +'.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}'    +'.meta-box{border:1px solid #ddd;border-radius:6px;padding:9px 11px}'    +'.meta-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}'    +'.meta-val{font-size:13px;font-weight:700;color:#1B3A5C}'    +'.sev-badge{display:inline-block;padding:4px 12px;border-radius:4px;font-weight:900;font-size:12px;border:1.5px solid '+sevColor+';color:'+sevColor+';background:'+(r.sev==='L3'?'#fff0f0':r.sev==='L2'?'#fff8e7':'#e8f5e9')+'}'    +'.section{margin-bottom:14px}'    +'.section-title{font-size:11px;font-weight:900;color:#1B3A5C;text-transform:uppercase;letter-spacing:.5px;border-left:3px solid #1B3A5C;padding-left:8px;margin-bottom:8px}'    +'.findings-box{background:#f8f8f8;border:1px solid #e0e0e0;border-radius:6px;padding:11px;font-size:13px;line-height:1.65;color:#222}'    +'table{width:100%;border-collapse:collapse;font-size:12px}'    +'th{background:#1B3A5C;color:white;padding:7px 8px;text-align:left;font-size:11px}'    +'.disclaimer{font-size:10px;color:#888;border-top:1px solid #eee;padding-top:10px;line-height:1.6;margin-bottom:14px}'    +'.sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px}'    +'.sign-box{border-top:1px solid #aaa;padding-top:6px}'    +'.sign-label{font-size:10px;color:#888;margin-bottom:16px}'    +'.sign-line{border-bottom:1px solid #aaa;margin-bottom:4px;height:24px}'    +'.sign-name{font-size:10px;color:#888}'    +'@media print{body{padding:0} .no-print{display:none}}'    +'</style></head><body>'    +'<div class="no-print" style="margin-bottom:16px;display:flex;gap:10px">'    +'<button onclick="window.print()" style="flex:1;padding:12px;background:#1B3A5C;color:white;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🖨 Сохранить PDF / Распечатать</button>'    +'<button onclick="window.close()" style="padding:12px 16px;background:#eee;border:none;border-radius:8px;font-size:14px;cursor:pointer">✕</button>'    +'</div>'    +'<div class="header">'    +'<div class="org">СИСТЕМА ОСИ РЕСПУБЛИКИ КАЗАХСТАН · ХАУЗМАСТЕР</div>'    +'<h1>АКТ ОБСЛЕДОВАНИЯ (ТЕХНИЧЕСКОГО ОСМОТРА)<br>ОБЩЕГО ИМУЩЕСТВА МКД</h1>'    +'<div class="act-num">'+actNum+' · AI Vision Inspector</div>'    +'</div>'    +'<div class="meta-grid">'    +'<div class="meta-box"><div class="meta-label">МКД / Адрес</div><div class="meta-val">'+mkd+'</div></div>'    +'<div class="meta-box"><div class="meta-label">ОСИ / Контракт</div><div class="meta-val">'+contract+'</div></div>'    +'<div class="meta-box"><div class="meta-label">Дата обследования</div><div class="meta-val">'+dateStr+'</div></div>'    +'<div class="meta-box"><div class="meta-label">Время</div><div class="meta-val">'+timeStr+'</div></div>'    +'<div class="meta-box"><div class="meta-label">Хаузмастер</div><div class="meta-val">'+hmName+'</div></div>'    +'<div class="meta-box"><div class="meta-label">Тип обследования</div><div class="meta-val">AI Vision · Фотодиагностика</div></div>'    +'</div>'    +'<div class="section">'    +'<div class="section-title">1. Объект обследования</div>'    +'<div class="meta-grid">'    +'<div class="meta-box"><div class="meta-label">Домен HM</div><div class="meta-val">'+(r.visDomain||r.code.split('-')[0]||'—')+'</div></div>'    +'<div class="meta-box"><div class="meta-label">Код HM</div><div class="meta-val" style="font-family:monospace">'+r.code+'</div></div>'    +'</div>'    +'<div class="meta-box" style="margin-top:8px"><div class="meta-label">Объект / Элемент</div><div class="meta-val">'+r.name+'</div></div>'    +'</div>'    +'<div class="section">'    +'<div class="section-title">2. Уровень приоритета</div>'    +'<span class="sev-badge">'+r.sev+' · '+sevLabel+'</span>'    +'</div>'    +'<div class="section">'    +'<div class="section-title">3. Результаты обследования</div>'    +'<div class="findings-box">'+(r.visFindings||r.name)+'</div>'    +'</div>'    +'<div class="section">'    +'<div class="section-title">4. Фотофиксация</div>'    +'<div style="border:1px solid #ddd;border-radius:6px;padding:10px;font-size:12px;color:#666">'    +'Фотоматериалы получены через AI Vision Inspector. ID сессии: '+r.id+'<br>Хранятся в системе Хаузмастер на устройстве специалиста.'    +'</div></div>'    +'<div class="section">'    +'<div class="section-title">5. Рекомендуемые меры</div>'    +'<table><thead><tr><th style="width:30px">№</th><th>Действие</th><th>Пояснение / SLA</th></tr></thead><tbody>'+actionsHtml+'</tbody></table>'    +'</div>'    +'<div class="disclaimer">'    +'Настоящий акт составлен по результатам визуального обследования с применением системы AI Vision Inspector (Хаузмастер). '    +'Акт не является строительной, технической либо судебной экспертизой и фиксирует фактически наблюдаемое состояние '    +'общего имущества объекта кондоминиума на момент обследования. При необходимости рекомендуется проведение '    +'специализированного технического обследования уполномоченной организацией.'    +'</div>'    +'<div class="section-title">Подписи</div>'    +'<div class="sign-grid">'    +'<div class="sign-box"><div class="sign-label">Хаузмастер / технический специалист</div><div class="sign-line"></div><div class="sign-name">'+hmName+'</div></div>'    +'<div class="sign-box"><div class="sign-label">Представитель ОСИ</div><div class="sign-line"></div><div class="sign-name">Ф.И.О. _______________________</div></div>'    +'</div>'    +'</body></html>';
+  var w=window.open('','_blank','width=480,height=800');
+  if(w){w.document.write(html);w.document.close();}
+  else{showCallToast('Разрешите открытие новых окон в браузере');}
+}
+
+function openActFromVision(id){
+  showPage('docs');
+  setTimeout(function(){ showDocsTab('act'); },100);
+}
+
 function renderDocsPlan(reqs){
   var open=reqs.filter(function(r){return r.status==='open';});
   if(!open.length) return '<div style="text-align:center;padding:24px;color:var(--muted)">Открытых заявок нет.</div>';
@@ -3323,6 +3352,28 @@ checkOnboarding();
     visLastText=(r.object||'')+'. '+(r.findings||'')+'. '+(r.actions||[]).map(function(a){return a.title;}).join('. ');
     document.getElementById('vis-voice-btn').style.display='flex';
     document.getElementById('vis-result').style.display='block';
+    // Save to history
+    var activeMkd=getActiveMKD();
+    var mkdAddr=activeMkd?activeMkd.address:(localStorage.getItem('hm_address')||'МКД не указан');
+    var contract=activeMkd?activeMkd.contract:(localStorage.getItem('hm_contract')||'б/н');
+    var reqs=getRequests();
+    var savedId=Date.now().toString();
+    reqs.unshift({
+      id:savedId, date:new Date().toISOString(),
+      mkd:mkdAddr, contract:contract,
+      code:r.code||r.domain+'-'+r.severity+'-000',
+      name:r.object||'AI Осмотр',
+      sev:r.severity||'L1',
+      status:'open', photos:[],
+      source:'vision',
+      visFindings:r.findings||'',
+      visActions:r.actions||[],
+      visDomain:r.domain||'',
+    });
+    localStorage.setItem('hm_requests',JSON.stringify(reqs.slice(0,200)));
+    showCallToast('📋 Сохранено в историю');
+    document.getElementById('vis-save-link').style.display='block';
+    document.getElementById('vis-save-link').dataset.rid=savedId;
   }
 
   window.visSpeak = function(){
